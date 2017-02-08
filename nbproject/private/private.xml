@@ -9,13 +9,16 @@
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/DefaultController.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/base.html.twig</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/FOSUserBundle/views/layout.html.twig</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/app/config/parameters.yml</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/routing.yml</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/default/index.html.twig</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/config.yml</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/NaturPers.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/AdminController.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/Group.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/User.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/security.yml</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/LegalEntity.php</file>
         </group>
     </open-files>
 </project-private>
