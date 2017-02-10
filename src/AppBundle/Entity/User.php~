@@ -248,38 +248,4 @@ class User extends BaseUser
     {
         return $this->pers;
     }
-
-    /**
-     * Add folio
-     *
-     * @param \AppBundle\Entity\portfolio $folio
-     *
-     * @return User
-     */
-    public function addFolio(\AppBundle\Entity\portfolio $folio)
-    {
-        $this->folios[] = $folio;
-
-        return $this;
-    }
-
-    /**
-     * Remove folio
-     *
-     * @param \AppBundle\Entity\portfolio $folio
-     */
-    public function removeFolio(\AppBundle\Entity\portfolio $folio)
-    {
-        $this->folios->removeElement($folio);
-    }
-
-    /**
-     * Get folios
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getFolios()
-    {
-        return $this->folios;
-    }
 }

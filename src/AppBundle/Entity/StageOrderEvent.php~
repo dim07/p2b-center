@@ -222,28 +222,4 @@ class StageOrderEvent
     {
         return $this->order;
     }
-
-    /**
-     * Set file
-     *
-     * @param \AppBundle\Entity\UserFile $file
-     *
-     * @return StageOrderEvent
-     */
-    public function setFile(\AppBundle\Entity\UserFile $file = null)
-    {
-        $this->File = $file;
-
-        return $this;
-    }
-
-    /**
-     * Get file
-     *
-     * @return \AppBundle\Entity\UserFile
-     */
-    public function getFile()
-    {
-        return $this->File;
-    }
 }

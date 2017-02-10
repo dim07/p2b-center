@@ -316,38 +316,4 @@ class project
     {
         return $this->Gip;
     }
-
-    /**
-     * Add stage
-     *
-     * @param \AppBundle\Entity\ProjectStage $stage
-     *
-     * @return project
-     */
-    public function addStage(\AppBundle\Entity\ProjectStage $stage)
-    {
-        $this->stages[] = $stage;
-
-        return $this;
-    }
-
-    /**
-     * Remove stage
-     *
-     * @param \AppBundle\Entity\ProjectStage $stage
-     */
-    public function removeStage(\AppBundle\Entity\ProjectStage $stage)
-    {
-        $this->stages->removeElement($stage);
-    }
-
-    /**
-     * Get stages
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getStages()
-    {
-        return $this->stages;
-    }
 }

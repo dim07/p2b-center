@@ -223,28 +223,5 @@ class OrderPay
     {
         return $this->statementDate;
     }
-
-    /**
-     * Set order
-     *
-     * @param \AppBundle\Entity\StageOrder $order
-     *
-     * @return OrderPay
-     */
-    public function setOrder(\AppBundle\Entity\StageOrder $order = null)
-    {
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Get order
-     *
-     * @return \AppBundle\Entity\StageOrder
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
 }
+

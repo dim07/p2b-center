@@ -633,38 +633,4 @@ class StageOrder
     {
         return $this->pays;
     }
-
-    /**
-     * Add event
-     *
-     * @param \AppBundle\Entity\StageOrderEvent $event
-     *
-     * @return StageOrder
-     */
-    public function addEvent(\AppBundle\Entity\StageOrderEvent $event)
-    {
-        $this->events[] = $event;
-
-        return $this;
-    }
-
-    /**
-     * Remove event
-     *
-     * @param \AppBundle\Entity\StageOrderEvent $event
-     */
-    public function removeEvent(\AppBundle\Entity\StageOrderEvent $event)
-    {
-        $this->events->removeElement($event);
-    }
-
-    /**
-     * Get events
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getEvents()
-    {
-        return $this->events;
-    }
 }

@@ -226,38 +226,4 @@ class ProjectStage
     {
         return $this->project;
     }
-
-    /**
-     * Add order
-     *
-     * @param \AppBundle\Entity\StageOrder $order
-     *
-     * @return ProjectStage
-     */
-    public function addOrder(\AppBundle\Entity\StageOrder $order)
-    {
-        $this->orders[] = $order;
-
-        return $this;
-    }
-
-    /**
-     * Remove order
-     *
-     * @param \AppBundle\Entity\StageOrder $order
-     */
-    public function removeOrder(\AppBundle\Entity\StageOrder $order)
-    {
-        $this->orders->removeElement($order);
-    }
-
-    /**
-     * Get orders
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getOrders()
-    {
-        return $this->orders;
-    }
 }

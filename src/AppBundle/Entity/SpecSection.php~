@@ -72,38 +72,5 @@ class SpecSection
     {
         return $this->name;
     }
-
-    /**
-     * Add section
-     *
-     * @param \AppBundle\Entity\Section $section
-     *
-     * @return SpecSection
-     */
-    public function addSection(\AppBundle\Entity\Section $section)
-    {
-        $this->sections[] = $section;
-
-        return $this;
-    }
-
-    /**
-     * Remove section
-     *
-     * @param \AppBundle\Entity\Section $section
-     */
-    public function removeSection(\AppBundle\Entity\Section $section)
-    {
-        $this->sections->removeElement($section);
-    }
-
-    /**
-     * Get sections
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getSections()
-    {
-        return $this->sections;
-    }
 }
+

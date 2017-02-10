@@ -99,28 +99,5 @@ class Section
     {
         return $this->name;
     }
-
-    /**
-     * Set spec
-     *
-     * @param \AppBundle\Entity\SpecSection $spec
-     *
-     * @return Section
-     */
-    public function setSpec(\AppBundle\Entity\SpecSection $spec = null)
-    {
-        $this->spec = $spec;
-
-        return $this;
-    }
-
-    /**
-     * Get spec
-     *
-     * @return \AppBundle\Entity\SpecSection
-     */
-    public function getSpec()
-    {
-        return $this->spec;
-    }
 }
+

@@ -6,16 +6,22 @@
             <file>file:/C:/xampp/htdocs/p2p_site/app/AppKernel.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/composer.json</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Repository/UserRepository.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/DefaultController.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/StageOrder.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/base.html.twig</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/FOSUserBundle/views/layout.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/config/parameters.yml</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/ProjectStage.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/routing.yml</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/default/index.html.twig</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/project.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/Section.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/portfolio.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/UserFile.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/StageOrderEvent.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/config.yml</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/NaturPers.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/AdminController.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/SpecSection.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/Group.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/OrderPay.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/User.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/app/config/security.yml</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/LegalEntity.php</file>
