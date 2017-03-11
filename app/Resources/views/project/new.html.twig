@@ -1,0 +1,41 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Новый проект
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Новый проект <span class="fa fa-plus-circle" aria-hidden="true"></span> </h2>
+    </div>
+</div>
+<div class="row">    
+    {{ form_start(form) }}
+    
+    {% include "project/_form.html.twig"   with {'form': form} %}
+    
+    <div class="row text-center">
+        <button type="submit" name="submit" value="save" class="btn btn-lg btn-primary"> 
+            Сохранить <span class="fa  fa-save" aria-hidden="true"></span>
+        </button>
+        <button type="submit" name="submit" value="saveAndAdd" class="btn btn-lg btn-info"> 
+            Сохранить и добавить <span class="fa fa-plus" aria-hidden="true"></span>
+        </button>
+    </div>
+    {{ form_end(form) }}
+</div>
+<hr/>
+
+<div class="form-group">
+    <a class="btn btn-default" href="{{ path('project') }}">
+        <span class="fa fa-list" aria-hidden="true"></span>
+        К списку проектов
+    </a>
+</div>
+
+
+
+{% endblock %}
+

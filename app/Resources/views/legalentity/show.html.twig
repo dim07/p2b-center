@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Юрлицо
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Данные Юрлица ({{ legalEntity.user.username }}) <span class="fa fa-list-alt" aria-hidden="true"></span> </h2>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <label class="col-md-4 control-label text-right">Наименование</label>
+        <div class="col-md-8">
+            {{ legalEntity.name }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label class="col-md-4 control-label text-right">Скрывать наименование</label>
+        <div class="col-md-8">
+            {% if legalEntity.hideName %}<i class="fa fa-check-square" aria-hidden="true"></i>{% else %}<i class="fa fa-times-rectangle" aria-hidden="true"></i>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label class="col-md-4 control-label text-right">Юридический адрес</label>
+        <div class="col-md-8">
+            {{ legalEntity.legalAdr }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label class="col-md-4 control-label text-right">Заказчик</label>
+        <div class="col-md-8">
+            {% if legalEntity.customer %}<i class="fa fa-check-square"></i>{% else %}<i class="fa fa-times-rectangle"></i>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label class="col-md-4 control-label text-right">Подрядчик</label>
+        <div class="col-md-8">
+            {% if legalEntity.contractor %}<i class="fa fa-check-square"></i>{% else %}<i class="fa fa-times-rectangle"></i>{% endif %}
+        </div>
+    </div>
+</div>
+        
+<hr/>
+
+
+<div class="row text-center">
+    {#
+    <a class="btn btn-default" href="{{ path('legalentity') }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Back to list
+    </a>
+    #}    
+    <a class="btn btn-lg btn-primary" href="{{ path('legalentity_edit', { 'id':  legalEntity.id }) }}">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Редактировать
+    </a>
+    {#    
+    <a class="btn btn-info" href="{{ path('legalentity_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>
+    <form action="{{ path('legalentity_delete', { 'id': legalEntity.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Delete
+        </button>
+    </form>
+    #}
+</div>
+
+
+{% endblock %}
+

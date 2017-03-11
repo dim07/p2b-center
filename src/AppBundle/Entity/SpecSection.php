@@ -24,7 +24,7 @@ class SpecSection
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=100, unique=true)
+     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
     private $name;
     
@@ -106,4 +106,9 @@ class SpecSection
     {
         return $this->sections;
     }
+    
+     public function __toString() 
+     {
+         return $this->name;
+     }        
 }

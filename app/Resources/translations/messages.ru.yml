@@ -1,0 +1,17 @@
+User: Пользователь
+Group: Группа
+Specialization: Специализация
+Section: Раздел
+EventType: 'Тип события'
+Name: Наименование
+Spec: Специализация
+'Id spec': 'ID спец-ции'
+Users: Пользователи
+Orders: Заказы
+Order: Заказ
+Sections: Разделы
+Region: Регион
+Rating: Рейтинг
+Fio: ФИО
+Phone: Телефон
+

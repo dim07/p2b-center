@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: localhost
+    database_port: null
+    database_name: p2b_site
+    database_user: p2b_sql
+    database_password: D11235813b
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    secret: 724ae33081b88653957f01ca4248ca8d5c53c2cd

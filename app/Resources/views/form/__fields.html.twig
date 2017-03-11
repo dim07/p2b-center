@@ -1,0 +1,21 @@
+{# src/AppBundle/Resources/views/Form/fields.html.twig #}
+{% extends 'form_div_layout.html.twig' %}
+
+{% block file_widget %}
+    {% spaceless %}
+
+    {{ block('form_widget') }}
+    {% if image_url is not null %}
+        <img src="{{ asset(image_url) }}"/>
+    {% endif %}
+
+    {% endspaceless %}
+{% endblock %}
+
+{% block date_widget %}
+    <div class="date_widget">
+        <div class="input-group date js-datepicker">
+            {{ block('form_widget_simple') }}
+        </div> 
+    </div>
+{% endblock %}

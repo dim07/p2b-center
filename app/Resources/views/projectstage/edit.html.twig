@@ -1,0 +1,118 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} -  Редактировать этап проекта
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header text-center">
+        <h2>Изменить данные этапа проекта <span class="fa fa-edit " aria-hidden="true"></span></h2>
+        <ol class="breadcrumb">
+            <li>
+                <a class="btn btn-link" href="{{ path('project_edit', { 'id':  projectStage.idProject }) }}">
+                {{ projectStage.project.name }}
+                </a>
+            </li>
+            <li class="active">
+                {{ projectStage.name }}
+            </li>
+        </ol>
+        
+    </div>
+</div>
+            
+{{ form_start(edit_form) }}
+<div class ="col-md-12">
+    {{ form_row(edit_form.name) }}
+    <div class="row">
+        <div class="col-md-4">{{ form_row(edit_form.num) }}</div>
+        <div class="col-md-4">{{ form_row(edit_form.cost) }}</div>
+        <div class="col-md-4">{{ form_row(edit_form.endDate) }}</div>
+    </div>    
+    {{ form_row(edit_form.info) }}
+</div>    
+
+<div class="row text-center">
+    <button type="submit" class="btn btn-lg btn-primary">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Сохранить
+    </button>
+</div>
+    
+{{ form_end(edit_form) }}
+
+<div class ="col-md-12">
+    <div class="row">
+        <div class="col-lg-6">
+            <button class="btn btn-lg btn-default" type="button" data-toggle="collapse" data-target="#collapseOrders" aria-expanded="true" aria-controls="collapseOrders">
+                Заказы
+                <span class="caret"></span>
+            </button>
+        </div>    
+    </div>
+    <div class="row collapse in" id="collapseOrders">    
+        <div class="col-md-6">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Создание заказа</h3>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(new_order_form, {'action': path('stageorder_new', { 'stage_id': projectStage.id }), 'method': 'post'}) }}
+                    {#{{ form_widget(new_stage_form) }}#}
+                    {% include "stageorder/_form.html.twig"   with {'form': new_order_form} %}
+                    <p class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fa fa-plus" aria-hidden="true"></span> Добавить
+                        </button>
+                    </p>
+                    
+                    {{ form_end(new_order_form) }} 
+                </div>
+            </div>
+
+        </div>    
+        <div class="col-md-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Список заказов</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                      {% for order in projectStage.orders %}
+                          <a href="{{ path('stageorder_edit', { 'id':  order.id }) }}" class="list-group-item"><span class="badge">{{ order.pays|length }}</span>{{ order }}</a>
+                      {% endfor %}
+                    </div> 
+                </div>
+            </div>
+        </div>  
+    </div>
+</div>
+
+<br/>
+
+    
+<div class="form-group col-md-12">
+    <a class="btn btn-default" href="{{ path('project_edit', { 'id':  projectStage.idProject }) }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Назад к проекту
+    </a>
+    {#<a class="btn btn-info" href="{{ path('projectstage_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>#}
+    <form action="{{ path('projectstage_delete', { 'id': projectStage.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить этап проекта?');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Удалить этап
+        </button>
+    </form>
+</div>
+
+</div>
+
+
+{% endblock %}
+

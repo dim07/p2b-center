@@ -1,0 +1,42 @@
+legalentity:
+    path:  /
+    defaults: { _controller: "AppBundle:LegalEntity:index" }
+
+legalentity_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:LegalEntity:show" }
+
+legalentity_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:LegalEntity:new" }
+
+legalentity_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:LegalEntity:create" }
+    requirements: { _method: post }
+
+legalentity_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:LegalEntity:edit" }
+
+legalentity_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:LegalEntity:update" }
+    requirements: { _method: post|put }
+
+legalentity_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:LegalEntity:delete" }
+    requirements: { _method: post|delete }
+    
+legalentity_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:LegalEntity:deleteById" }
+    requirements: { _method: get }
+    
+
+legalentity_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:LegalEntity:bulk" }
+    requirements: { _method: post }
+    

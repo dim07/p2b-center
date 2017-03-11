@@ -12,7 +12,7 @@ parameters:
 
 framework:
     #esi:             ~
-    #translator:      { fallbacks: ["%locale%"] }
+    translator:      { fallbacks: ["%locale%"] }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -43,6 +43,9 @@ twig:
     strict_variables: "%kernel.debug%"
     form_themes:
     - 'bootstrap_3_layout.html.twig' 
+    - 'VichUploaderBundle:Form:fields.html.twig'
+    - 'form/fields.html.twig'
+    - LexikFormFilterBundle:Form:form_div_layout.html.twig
 
 # Doctrine Configuration
 doctrine:
@@ -60,12 +63,13 @@ doctrine:
         #   2. Uncomment database_path in parameters.yml.dist
         #   3. Uncomment next line:
         #path:     "%database_path%"
-
+        
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
-
+                
+            
 # Swiftmailer Configuration
 swiftmailer:
     transport: "%mailer_transport%"
@@ -78,12 +82,25 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb' and 'couchdb'
     firewall_name: main
     user_class: AppBundle\Entity\User
+    from_email:
+        address: d_bar@mail.ru
+        sender_name: Admin
     group:
         group_class: AppBundle\Entity\Group
+    registration:
+        form:
+            type: AppBundle\Form\RegistrationType    
+    profile:
+        form:
+            type: AppBundle\Form\ProfileFormType        
         
 easy_admin:
-#    formats:
-#        datetime: 'd/m/Y h:i A e'
+    formats:
+        date:     'd.m.Y'
+        time:     'H:i'
+        datetime: 'd.m.Y H:i:s'
+    list:
+        max_results: 100
     entities:
         User:
             class: AppBundle\Entity\User
@@ -107,6 +124,9 @@ easy_admin:
                     - { property: 'plainPassword', type: 'text', type_options: { required: false } }
                     - { property: 'roles', type: 'choice', type_options: { multiple: true, choices: { 'ROLE_USER': 'ROLE_USER', 'ROLE_ADMIN': 'ROLE_ADMIN' } } }
                     - { property: 'imageFile', type: 'vich_image' }
+                    - fio
+                    - sections
+                    - odrers
 #                    - { property: 'updatedAt', default: '0000-00-00 00:00:00' }
             form:
                 fields:
@@ -119,6 +139,9 @@ easy_admin:
                     - { property: 'plainPassword', type: 'text', type_options: { required: false } }
                     - { property: 'roles', type: 'choice', type_options: { multiple: true, choices: { 'ROLE_USER': 'ROLE_USER', 'ROLE_ADMIN': 'ROLE_ADMIN' } } }
                     - { property: 'imageFile', type: 'vich_image' }
+                    - fio
+                    - sections
+#                    - odrers
 #                    - { property: 'updatedAt', default: '0000-00-00 00:00:00' }
         Group:    
             class: AppBundle\Entity\Group   
@@ -131,6 +154,43 @@ easy_admin:
                 fields:
                     - name
                     - { property: 'roles', type: 'choice', type_options: { multiple: true, choices: { 'ROLE_USER': 'ROLE_USER', 'ROLE_ADMIN': 'ROLE_ADMIN' } } }
+        Specialization: 
+            class: AppBundle\Entity\SpecSection  
+            list:
+                fields:
+                    - id
+                    - name
+                    - sections
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'sections', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'  
+                    - '-sections'
+        Section: 
+            class: AppBundle\Entity\Section
+            list:
+                sort: 'spec'
+                fields:
+                    - id
+                    - name
+                    - id_spec
+                    - spec
+                    - users
+                    - orders
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'spec', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'
+        EventType:
+            class: AppBundle\Entity\EventType
         
 vich_uploader:
     db_driver: orm       
@@ -138,6 +198,9 @@ vich_uploader:
         avatar_images:
             uri_prefix:         %app.path.avatar_images%
             upload_destination: %kernel.root_dir%/../web/uploads/images/avatars
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true
             
 liip_imagine :
     resolvers :

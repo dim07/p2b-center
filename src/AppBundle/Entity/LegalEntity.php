@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * LegalEntity
@@ -55,6 +56,21 @@ class LegalEntity
      * @ORM\Column(name="contractor", type="boolean", nullable=true)
      */
     private $contractor;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="project", mappedBy="Contractor")
+     */
+    private $contractprojects;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="Contractor")
+     */
+    private $contractorders;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="project", mappedBy="Customer")
+     */
+    private $customprojects;
 
     /**
      * @var int
@@ -70,7 +86,14 @@ class LegalEntity
      */
     private $user;
 
-
+    
+    public function __construct()
+    {
+        $this->contractprojects = new ArrayCollection();
+        $this->contractorders = new ArrayCollection();
+        $this->customprojects = new ArrayCollection();
+    }
+    
     /**
      * Get id
      *
@@ -243,5 +266,112 @@ class LegalEntity
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * Add contractproject
+     *
+     * @param \AppBundle\Entity\project $contractproject
+     *
+     * @return LegalEntity
+     */
+    public function addContractproject(\AppBundle\Entity\project $contractproject)
+    {
+        $this->contractprojects[] = $contractproject;
+
+        return $this;
+    }
+
+    /**
+     * Remove contractproject
+     *
+     * @param \AppBundle\Entity\project $contractproject
+     */
+    public function removeContractproject(\AppBundle\Entity\project $contractproject)
+    {
+        $this->contractprojects->removeElement($contractproject);
+    }
+
+    /**
+     * Get contractprojects
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getContractprojects()
+    {
+        return $this->contractprojects;
+    }
+
+    /**
+     * Add customproject
+     *
+     * @param \AppBundle\Entity\project $customproject
+     *
+     * @return LegalEntity
+     */
+    public function addCustomproject(\AppBundle\Entity\project $customproject)
+    {
+        $this->customprojects[] = $customproject;
+
+        return $this;
+    }
+
+    /**
+     * Remove customproject
+     *
+     * @param \AppBundle\Entity\project $customproject
+     */
+    public function removeCustomproject(\AppBundle\Entity\project $customproject)
+    {
+        $this->customprojects->removeElement($customproject);
+    }
+
+    /**
+     * Get customprojects
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCustomprojects()
+    {
+        return $this->customprojects;
+    }
+
+    /**
+     * Add contractorder
+     *
+     * @param \AppBundle\Entity\StageOrder $contractorder
+     *
+     * @return LegalEntity
+     */
+    public function addContractorder(\AppBundle\Entity\StageOrder $contractorder)
+    {
+        $this->contractorders[] = $contractorder;
+
+        return $this;
+    }
+
+    /**
+     * Remove contractorder
+     *
+     * @param \AppBundle\Entity\StageOrder $contractorder
+     */
+    public function removeContractorder(\AppBundle\Entity\StageOrder $contractorder)
+    {
+        $this->contractorders->removeElement($contractorder);
+    }
+
+    /**
+     * Get contractorders
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getContractorders()
+    {
+        return $this->contractorders;
+    }
+    
+    public function __toString() 
+    {
+        return $this->getName();
     }
 }

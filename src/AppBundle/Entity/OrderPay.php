@@ -247,4 +247,9 @@ class OrderPay
     {
         return $this->order;
     }
+    
+    public function __toString() 
+    {
+        return 'ID оплаты: '.$this->getId();
+    }
 }

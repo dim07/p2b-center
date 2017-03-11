@@ -1,105 +1,227 @@
+{% set site_name = 'P2B площадка' %}
+{% set currenturl = path(app.request.attributes.get('_route'),
+                           app.request.attributes.get('_route_params')) %}
+                          
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}">
     <head>
         <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>{% block title %}P2P площадка{% endblock %}</title>
+        <title>{% block title %}{{ site_name }}{% endblock %}</title>
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('css/bootstrap-flatly-3.3.7.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/font-lato.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/bootstrap-datetimepicker.min.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/highlight-solarized-light.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+{#            <link rel="stylesheet" href="{{ asset('css/bootstrap-datetimepicker.min.css') }}">#}
+            <link href='http://fonts.googleapis.com/css?family=Roboto:400,900&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+            <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    {% block style %}    
+        <style>
+            .bg-0 {
+                background: url('{{ asset('img/bg.jpg') }}') no-repeat center center fixed;
+                background-size:cover;
+                {% if page_name != 'home' %} 
+                padding-top: 104px;
+                {% endif %}
+            }
+            .status {
+                background-image: url('{{ asset('img/load.gif') }}');
+            }
+            
+        </style>
+    {% endblock %}    
     </head>
+    
+    {% block carousel %}
+        
+    {% endblock %}    
+    
     <body>
+        <!-- Part 1: Wrap all page content here -->
+    <div id="wrap" class="bg-0">
+
         {% block header %}
-            <header>
-                <div class="navbar navbar-default navbar-static-top" role="navigation">
-                    <div class="container">
-                        <div class="navbar-header">
-                            <a class="navbar-brand" href="{{ path('homepage') }}">
-                                Symfony Demo
-                            </a>
-
-                            <button type="button" class="navbar-toggle"
-                                    data-toggle="collapse"
-                                    data-target=".navbar-collapse">
-                                <span class="sr-only">{{ 'menu.toggle_nav'|trans }}</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                        </div>
-                        
-                        
-                        <div class="pull-right">            
-                            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                            <div class="btn-group">
-                              <a class="btn btn-primary" href="#"><i class="fa fa-user" aria-hidden="true"> {{app.user.username}}</i></a> 
-                                      <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                                      <ul class="dropdown-menu">
-                                      <li><a href="{{ path('fos_user_profile_edit') }}"><i class="fa fa-vcard-o" aria-hidden="true"></i> Профиль</a></li>
-                                      <li><a href="{{ path('fos_user_change_password') }}"><i class="fa fa-key" aria-hidden="true"></i> Сменить пароль</a></li>
-                                      <li class="divider"></li>
-                                      <li><a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Выход</a></li>
-                                      </ul>
-
-                            </div>
-                            {% else %} 
-                            <div class="pull-right">
-                              <li><a href="{{ path('fos_user_security_login') }}"><i class="fa fa-sign-in" aria-hidden="true"> Войти</i></a></li>  
-                              {#<a class="btn btn-primary" href="{{ path('fos_user_security_login') }}"><i class="icon-user icon-white"></i> Вход</a> 
-                              <a class="btn btn-primary" href="{{ path('fos_user_registration_register') }}"><i class="icon-flag icon-white"></i> Регистрация</a>#}
-                            </div>         
-                        {% endif %}
-                        </div>  
-                                
-                    </div>
-                </div>
-            </header>
+            {% include '_page_header.twig' with {'page_name': page_name} %}
         {% endblock %}
         
-        <div class="container body-container">
-            {% block body %}
-                <div class="row">
-                    <div id="main" class="col-sm-9">
-                        {{ include('default/_flash_messages.html.twig') }}
+        <!-- =========================
+            PRE LOADER       
+         ============================== -->
+         <div class="preloader">
+           <div class="status">&nbsp;</div>
+         </div>
 
-                        {% block main %}{% endblock %}
-                    </div>
+        {% set ttl = site_name %}    
+        {#<div class="affix-panel">
+            <ul class="nav nav-stacked main-nav-list">
+                <li>
+                    <a id="close-affix" class="btn btn-lg" href="#home">
+                        <i class="fa fa-close"></i>
+                    </a>
+                </li> 
+                <li><a class="btn btn-lg btn-social-icon btn-facebook" onclick="Share.facebook('{{ currenturl }}','{{ ttl }}','','')"><i class="fa fa-facebook fa-2x"></i></a></li>
+                <li><a class="btn btn-lg btn-social-icon btn-twitter" onclick="Share.twitter('{{ currenturl }}','{{ ttl }}')"><i class="fa fa-twitter fa-2x"></i></a></li>   
+                <li><a class="btn btn-lg btn-social-icon btn-vk" onclick="Share.vkontakte('{{ currenturl }}','{{ ttl }}','','')"><i class="fa fa-vk fa-2x"></i></a></li>
+                <li><a class="btn btn-lg btn-social-icon btn-odnoklassniki" onclick="Share.odnoklassniki('{{ currenturl }}','{{ ttl }}')"><i class="fa fa-odnoklassniki fa-2x"></i></a></li>
+                <li><a class="btn btn-lg btn-social-icon btn-google-plus" onclick="Share.googleplus('{{ currenturl }}')"><i class="fa fa-google-plus fa-2x"></i></a></li>
 
-                    <div id="sidebar" class="col-sm-3">
-                        {% block sidebar %}
+            </ul> 
+
+        </div>#}
+                
+        <nav id="nav-r">
+                <ul class="list-unstyled side-menu-top">
+                        <!--Include your navigation here-->
+                        <li class="text-right"><a href="#" id="nav-close"><i class="fa fa-times-circle-o fa-lg" aria-hidden="true"></i></a></li>
+                </ul>
+                   
+
+                <ul class="nav nav-pills nav-stacked side-pills">
+                    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <li role="presentation pills-item" class="dropdown" id="accordion">
+                            <a aria-controls="collapseCtg" aria-expanded="true" data-parent="#accordion" data-toggle="collapse"
+                            href="##collapseCtg">
+                                 <span class="fa fa-user fa-lg" aria-hidden="true"> {{app.user.username}}</span>
+                                 <span class="fa fa-caret-down"></span>
+                             </a>
+                             <div {#aria-labelledby="headingOne"#} class="panel-collapse collapse in" id="collapseCtg" role="tabpanel">
+                             <ul class="panel-body nav nav-pills nav-stacked side-pills">
+                                 <li>
+                                     <a href="{{ path('fos_user_profile_edit') }}">
+                                         <h5><i class="fa fa-chevron-left"></i> Профиль <span class="badge pull-right"></span></h5>
+                                     </a>
+                                 </li>
+                                 <li>
+                                     <a href="{{ path('fos_user_change_password') }}">
+                                         <h5><i class="fa fa-chevron-left"></i> Сменить пароль <span class="badge pull-right"></span></h5>
+                                     </a>
+                                 </li>
+                                 <li>
+                                     <a href="{{ path('fos_user_security_logout') }}">
+                                         <h5><i class="fa fa-chevron-left"></i> Выход <span class="badge pull-right"></span></h5>
+                                     </a>
+                                 </li>        
+                                 <li role="separator" class="divider"></li>
+                                 
+                                 {% set  legentity = app.user.legentity %}
+                                 {% if legentity %}
+                                 <li>
+                                     <a href="{{ path('legalentity_show', { 'id': legentity.id }) }}">
+                                        <h5><i class="fa fa-chevron-left"></i> Юрлицо <span class="badge pull-right"></span></h5>
+                                     </a>
+                                 </li>       
+                                    {% if legentity.customer %}   
+                                 <li>       
+                                    <a href="{{ path('project', { 'id': legentity.id }) }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Наши проекты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>       
+                                 <li>       
+                                    <a href="{{ path('project_new') }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Новый проект <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>       
+                                    {% endif %}  
+                                    {% if legentity.contractor %}   
+                                 <li>       
+                                    <a href="{{ path('stageorder') }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Наши работы <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>       
+                                 <li>       
+                                    <a href="{{ path('stageorder') }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Наши предложения <span class="badge pull-right"></span></h5>
+                                    </a>    
+                                 </li> 
+                                     {% endif %}
+                                     
+                                 {% else %}   
+                                 <li>
+                                     <a href="{{ path('legalentity_new') }}">
+                                         <h5><i class="fa fa-chevron-left"></i> Создать Юрлицо <span class="badge pull-right"></span></h5>
+                                     </a>
+                                 </li>    
+                                 {% endif %}    
+                                 <li role="separator" class="divider"></li>
+                                 <li>
+                                    <a href="{{ path('portfolio') }}">    
+                                           <h5><i class="fa fa-chevron-left"></i> Портфолио <span class="badge pull-right"></span></h5>
+                                   </a>
+                                 </li>
+                                 <li>
+                                    <a href="{{ path('stageorder') }}">    
+                                           <h5><i class="fa fa-chevron-left"></i> Мои работы <span class="badge pull-right"></span></h5>
+                                   </a>
+                                 </li>
+                                 <li>
+                                   <a href="{{ path('stageorder') }}">    
+                                       <h5><i class="fa fa-chevron-left"></i> Мои предложения <span class="badge pull-right"></span></h5>
+                                   </a>
+                                </li>
+                             </ul>
+                         </li>        
+                                
+                    {% else %} 
+                        <li role="presentation pills-item">
+                            <a href="{{ path('fos_user_security_login') }}">
+                                <h4><i class="fa fa-chevron-left"></i> Войти</h4>
+                            </a>
+                        </li>
+                        <li role="presentation pills-item">        
+                            <a href="{{ path('fos_user_registration_register') }}">
+                                <h4><i class="fa fa-chevron-left"></i> Регистрация</h4>
+                            </a>    
+                        </li>
+                    {% endif %}
+                </ul>
+        </nav>        
+                
+        <div class="container-fluid body_content">
+            {#<div class="container body_content">#}
+                {{ include('default/_flash_messages.html.twig') }}
+                {% block body %}
+                    <div class="row">
+                        <div id="main" class="col-sm-9">
                             
-                        {% endblock %}
+
+                            {% block main %}{% endblock %}
+                        </div>
+
+                        <div id="sidebar" class="col-sm-3">
+                            {% block sidebar %}
+
+                            {% endblock %}
+                        </div>
                     </div>
-                </div>
-            {% endblock %}
+                {% endblock %}
+            {#</div>#}
         </div>
-        
+        <div id="push"></div>
+    </div>  
         {% block footer %}
-            <footer>
+            <footer id="footer">
                 <div class="container">
                     <div class="row">
-                        <div id="footer-copyright" class="col-md-6">
-                            <p>&copy; {{ 'now'|date('Y') }} - The Symfony Project</p>
-                            <p>{{ 'mit_license'|trans }}</p>
+                        <div id="footer-copyright" class="col-md-4">
+                            <br>
+                            <h5 class="text-muted">Copyright &copy; P2B площадка 2017</h5>
                         </div>
-                        <div id="footer-resources" class="col-md-6">
-                            <p>
-                                <a href="https://twitter.com/symfony" title="Symfony Twitter">
-                                    <i class="fa fa-twitter" aria-hidden="true"></i>
-                                </a>
-                                <a href="https://www.facebook.com/SensioLabs" title="SensioLabs Facebook">
-                                    <i class="fa fa-facebook" aria-hidden="true"></i>
-                                </a>
-                                <a href="https://symfony.com/blog/" title="Symfony Blog">
-                                    <i class="fa fa-rss" aria-hidden="true"></i>
-                                </a>
-                            </p>
+                        <div id="footer-resources" class="col-md-4">
+                            <ul class="list-unstyled" style="margin-top: 8px; font-size: 14px">
+                                <li><i class="fa fa-phone fa-fw"></i> (123) 456-7890</li>
+                                <li><i class="fa fa-envelope-o fa-fw"></i> <a href="mailto:name@example.com">name@example.com</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="footer-shared" class="col-md-4">
+                            <ul class="list-inline" style="margin-top: 8px;">
+                                <li><a class="btn btn-lg btn-social-icon btn-facebook" onclick="Share.facebook('{{ currenturl }}','{{ ttl }}','','')"><i class="fa fa-facebook fa-2x"></i></a></li>
+                                <li><a class="btn btn-lg btn-social-icon btn-twitter" onclick="Share.twitter('{{ currenturl }}','{{ ttl }}')"><i class="fa fa-twitter fa-2x"></i></a></li>   
+                                <li><a class="btn btn-lg btn-social-icon btn-vk" onclick="Share.vkontakte('{{ currenturl }}','{{ ttl }}','','')"><i class="fa fa-vk fa-2x"></i></a></li>
+                                <li><a class="btn btn-lg btn-social-icon btn-odnoklassniki" onclick="Share.odnoklassniki('{{ currenturl }}','{{ ttl }}')"><i class="fa fa-odnoklassniki fa-2x"></i></a></li>
+                                <li><a class="btn btn-lg btn-social-icon btn-google-plus" onclick="Share.googleplus('{{ currenturl }}')"><i class="fa fa-google-plus fa-2x"></i></a></li>
+                            </ul> 
                         </div>
                     </div>
                 </div>
@@ -108,13 +230,18 @@
         
         {% block javascripts %}
             <script src="{{ asset('js/jquery-2.2.4.min.js') }}"></script>
-            <script src="{{ asset('js/moment.min.js') }}"></script>
+            <!-- Modernizr javascript -->
+            <script src="{{ asset('js/modernizr.js') }}"></script>
+            <script src="{{ asset('js/toucheffects.js') }}"></script>        
+
             <script src="{{ asset('js/bootstrap-3.3.7.min.js') }}"></script>
+            <script src="{{ asset('js/moment.min.js') }}"></script>
             <script src="{{ asset('js/highlight.pack.js') }}"></script>
             <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
-            <script src="{{ asset('js/main.js') }}"></script>
+            <script src="{{ asset('js/template.js') }}"></script>
             
             <script src="{{ asset('bundles/petkoparacrudgenerator/js/petkopara-crud-generator.js') }}"></script>
+
         {% endblock %}
 
     </body>

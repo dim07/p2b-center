@@ -1,0 +1,40 @@
+<div class ="col-md-12">
+    {#{{ form_widget(form) }}#}
+    {{ form_row(form.section) }}
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.startDate) }}
+        </div> 
+        <div class="col-md-6">
+            {{ form_row(form.factEndDate) }}
+        </div>
+    </div>    
+    <div class="row">    
+        <div class="col-md-6">
+            {{ form_row(form.isPublic) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.isLegalEntity) }}
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col-md-6">
+            {{ form_row(form.UserIsp) }}
+        </div>   
+        <div class="col-md-6">
+            {{ form_row(form.Contractor) }}
+        </div>     
+    </div>
+    {{ form_row(form.AfterOrder) }}    
+    <div class="row ">
+        <div class="col-md-12">
+            {{ form_row(form.info) }}
+        </div>   
+    </div>    
+    <hr>
+                
+</div>    
+
+
+    

@@ -1,0 +1,96 @@
+{% set col1 = 4 %}
+{% set col2 = 7 %}
+{% set site_logo = asset('logodw.png') %}
+
+{% set site_slogan = 'Сделаем работу вместе!' %}
+
+<header class="header fixed clearfix navbar navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-11 col-xs-11 col-lg-{{ col1 }}">
+
+                <!-- header-left start -->
+                <!-- ================ -->
+                <div class="header-left clearfix">
+
+                    <!-- logo -->
+                    <div class="logo smooth-scroll">
+                        <a href="/"><img id="logo" src="{{ site_logo }}" alt="P2B" ></a>
+                    </div>
+
+                    <!-- name-and-slogan -->
+                    <div class="site-name-and-slogan smooth-scroll">
+                        <div class="site-name hidden-xs"><a href="/">{{ site_name }}</a></div>
+                        <div class="site-slogan hidden-xs hidden-sm hidden-md">{{ site_slogan }}</div>
+                    </div>
+                        
+                </div>
+                <!-- header-left end -->
+                {#<div class="clearfix">
+                {% include '_sub_searchbox.twig' %}
+                </div>#}
+            </div>
+                   
+            <div class="col-lg-{{ col2 }} hidden-xs hidden-sm hidden-md">
+
+                <!-- header-right start -->
+                <!-- ================ -->
+                <div class="header-right clearfix">
+
+                    <!-- main-navigation start -->
+                    <!-- ================ -->
+                    <div class="main-navigation animated">
+                        
+                        <!-- navbar start -->
+                        <!-- ================ -->
+                        <nav class="navbar navbar-default" role="navigation">
+                            <div class="container-fluid">
+
+                                <!-- Toggle get grouped for better mobile display -->
+                                {#<div class="navbar-header pull-left">
+                                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>#}
+
+                                <!-- Collect the nav links, forms, and other content for toggling -->
+                                <div class="navbar-collapse {#scrollspy smooth-scroll hidden-xs hidden-sm#}" id="navbar-collapse-1">
+                                    <ul class="nav navbar-nav navbar-left">
+                                        <li {% if page_name == 'home' %} class="active" {% endif %}><a class="stroke" href="{{ path('homepage') }}"><strong><span class="fa fa-home fa-lg"></span> Главная</strong></a></li>
+                                        {#<li><a class="stroke" href="{{ path('stageorder') }}"><strong><span class="fa fa-handshake-o fa-lg"></span> Заказы</strong></a></li>#}
+                                        <li {% if page_name == 'orders' %} class="active" {% endif %}><a class="stroke" href="{{ path('stageorder') }}"><strong><span class="fa fa-handshake-o fa-lg"></span> Заказы</strong></a></li>
+                                        <li {% if page_name == 'experts' %} class="active" {% endif %}><a class="stroke" href="{{ path('experts') }}"><strong><span class="fa fa-user-circle-o fa-lg"></span> Исполнители</strong></a></li>    
+                                        <li {% if page_name == 'contractors' %} class="active" {% endif %}><a class="stroke" href="{{ path('subcontractors') }}"><strong><span class="fa fa-users fa-lg"></span> Подрядчики</strong></a></li>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <!-- navbar end -->
+
+                    </div>
+                    <!-- main-navigation end -->
+
+                </div>
+                <!-- header-right end -->
+
+            </div>
+            <div class="col-md-1">  
+                
+                                  
+                <ul class="nav navbar-right">
+                    <li>
+                        <div class="navbar-header pull-right">
+                            <a id="nav-expander" class="nav-expander fixed stroke">
+                              <i class="fa fa-chevron-left fa-lg faa-horizontal animated"></i><i class="fa fa-bars fa-lg"></i>
+                            </a>
+                        </div>
+                    </li>
+                </ul> 
+            </div>
+        </div>
+    </div>
+</header>

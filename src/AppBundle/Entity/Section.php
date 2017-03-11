@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Section
@@ -40,6 +41,17 @@ class Section
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
+    
+     /**
+     * Many Sections have Many Users.
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\User", mappedBy="sections")
+     */
+    private $users;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="section")
+     */
+    private $orders;
 
 
     /**
@@ -122,5 +134,86 @@ class Section
     public function getSpec()
     {
         return $this->spec;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+        $this->orders = new ArrayCollection();
+    }
+
+    /**
+     * Add user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Section
+     */
+    public function addUser(\AppBundle\Entity\User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param \AppBundle\Entity\User $user
+     */
+    public function removeUser(\AppBundle\Entity\User $user)
+    {
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+    
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Add order
+     *
+     * @param \AppBundle\Entity\StageOrder $order
+     *
+     * @return Section
+     */
+    public function addOrder(\AppBundle\Entity\StageOrder $order)
+    {
+        $this->orders[] = $order;
+
+        return $this;
+    }
+
+    /**
+     * Remove order
+     *
+     * @param \AppBundle\Entity\StageOrder $order
+     */
+    public function removeOrder(\AppBundle\Entity\StageOrder $order)
+    {
+        $this->orders->removeElement($order);
+    }
+
+    /**
+     * Get orders
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getOrders()
+    {
+        return $this->orders;
     }
 }

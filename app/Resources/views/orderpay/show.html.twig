@@ -1,0 +1,94 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} - orderPay
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2>View orderPay <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <p><strong>Id</strong></p>
+        <p>
+            {{ orderPay.id }}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Idorder</strong></p>
+        <p>
+            {{ orderPay.idOrder }}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Planpay</strong></p>
+        <p>
+            {{ orderPay.planPay }}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Factpay</strong></p>
+        <p>
+            {{ orderPay.factPay }}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Chargdate</strong></p>
+        <p>
+            {% if orderPay.chargDate %}{{ orderPay.chargDate|date('Y-m-d') }}{% endif %}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Paydate</strong></p>
+        <p>
+            {% if orderPay.payDate %}{{ orderPay.payDate|date('Y-m-d') }}{% endif %}
+        </p>
+
+    </div>
+    <div class="col-md-6">
+        <p><strong>Statementdate</strong></p>
+        <p>
+            {% if orderPay.statementDate %}{{ orderPay.statementDate|date('Y-m-d') }}{% endif %}
+        </p>
+
+    </div></div>
+
+<hr/>
+
+
+<div class="form-group">
+    <a class="btn btn-default" href="{{ path('orderpay') }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Back to list
+    </a>
+    <a class="btn btn-primary" href="{{ path('orderpay_edit', { 'id':  orderPay.id }) }}">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Edit
+    </a>
+    <a class="btn btn-info" href="{{ path('orderpay_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>
+    <form action="{{ path('orderpay_delete', { 'id': orderPay.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Delete
+        </button>
+    </form>
+</div>
+
+
+{% endblock %}
+

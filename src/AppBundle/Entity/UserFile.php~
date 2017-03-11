@@ -199,5 +199,52 @@ class UserFile
     {
         return $this->ext;
     }
-}
 
+    /**
+     * Set idFolio
+     *
+     * @param integer $idFolio
+     *
+     * @return UserFile
+     */
+    public function setIdFolio($idFolio)
+    {
+        $this->idFolio = $idFolio;
+
+        return $this;
+    }
+
+    /**
+     * Get idFolio
+     *
+     * @return integer
+     */
+    public function getIdFolio()
+    {
+        return $this->idFolio;
+    }
+
+    /**
+     * Set folio
+     *
+     * @param \AppBundle\Entity\portfolio $folio
+     *
+     * @return UserFile
+     */
+    public function setFolio(\AppBundle\Entity\portfolio $folio = null)
+    {
+        $this->folio = $folio;
+
+        return $this;
+    }
+
+    /**
+     * Get folio
+     *
+     * @return \AppBundle\Entity\portfolio
+     */
+    public function getFolio()
+    {
+        return $this->folio;
+    }
+}

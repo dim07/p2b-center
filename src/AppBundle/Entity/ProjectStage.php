@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ProjectStage
@@ -34,6 +36,13 @@ class ProjectStage
      */
     private $project;
 
+    /** Для упорядочивания этапов
+     * @var int
+     *
+     * @ORM\Column(name="num", type="integer", nullable=true)
+     */
+    private $num;
+    
     /**
      * @var string
      *
@@ -41,10 +50,12 @@ class ProjectStage
      */
     private $name;
 
+
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="EndDate", type="date", nullable=true)
+     * @ORM\Column(name="EndDate", type="datetime", nullable=true)
+     * @Assert\DateTime()
      */
     private $endDate;
 
@@ -64,11 +75,13 @@ class ProjectStage
     
      /**
      * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="stage")
+     * @ORM\OrderBy({"startDate" = "ASC"})
      */
     private $orders;
     
     public function __construct()
     {
+        $this->endDate = new \DateTime();
         $this->orders = new ArrayCollection();
     }
 
@@ -105,6 +118,30 @@ class ProjectStage
     public function getIdProject()
     {
         return $this->idProject;
+    }
+    
+    /**
+     * Set num
+     *
+     * @param integer $num
+     *
+     * @return ProjectStage
+     */
+    public function setNum($num)
+    {
+        $this->num = $num;
+
+        return $this;
+    }
+
+    /**
+     * Get num
+     *
+     * @return int
+     */
+    public function getNum()
+    {
+        return $this->num;
     }
 
     /**
@@ -259,5 +296,10 @@ class ProjectStage
     public function getOrders()
     {
         return $this->orders;
+    }
+    
+    public function __toString() 
+    {
+        return $this->getName();
     }
 }

@@ -1,0 +1,74 @@
+{% trans_default_domain 'FOSUserBundle' %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Профиль пользователя <span class="fa fa-vcard-o " aria-hidden="true"></span></h2>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-6 "><h2 class = "text-center"><icon class = "fa fa-user"></icon> Имя пользователя: {{ user.username }}</h2> </div>
+    <div class="col-md-6 "><h2 class = "text-center"><icon class = "fa fa-inbox"></icon> Email: {{ user.email }}</h2> </div>
+</div>    
+<hr>
+{{ form_start(form, { 'action': path('fos_user_profile_edit'), 'attr': { 'class': 'fos_user_profile_edit form-horizontal' }, role: 'form' }) }}
+<div class="row">
+   
+    <div class="col-md-12 personal-info">
+            
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.fio) }}</label>
+            <div class="col-lg-8">
+                {{ form_errors(form.fio) }}
+                {{ form_widget(form.fio) }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.hideName) }}</label>
+            <div class="col-lg-8">
+                {{ form_errors(form.hideName) }}
+                {{ form_widget(form.hideName) }}
+            </div>
+        </div>    
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.phone) }}</label>
+            <div class="col-lg-8">
+                {{ form_errors(form.phone) }}
+                {{ form_widget(form.phone) }}
+            </div>
+        </div>     
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.region) }}</label>
+            <div class="col-lg-8">
+                {{ form_errors(form.region) }}
+                {{ form_widget(form.region) }}
+            </div>
+        </div> 
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.sections) }}</label>
+            <div class="col-lg-8">
+                {{ form_errors(form.sections) }}
+                {{ form_widget(form.sections) }}
+            </div>
+        </div>  
+        <div class="form-group">
+            <label class="col-lg-3 control-label">{{ form_label(form.imageFile) }}</label>
+            <div class="col-lg-8">
+                <div class="col-sm-offset-1 col-sm-8">
+                {{ form_errors(form.imageFile) }}
+                
+                {{ form_widget(form.imageFile) }}
+                </div>
+            </div>
+        </div>    
+            
+        <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8 text-right">
+                <input type="submit" class="btn btn-lg btn-primary" value="{{ 'profile.edit.submit'|trans }} " />
+            </div>
+        </div>
+    {{ form_end(form) }}
+    </div>
+</div>

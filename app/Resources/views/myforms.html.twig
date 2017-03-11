@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    {#<link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet" />#}
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" />
+    {#<link href="{{ asset('css/fileinput.min.css') }}" media="all" rel="stylesheet" type="text/css" />#}
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-datetimepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/highlight-solarized-light.css') }}">
+    {#{{ form_stylesheet(form) }}#}
+{% endblock %}
+
+{% block javascripts %}
+     {#{{ parent() }}#}
+    {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('js/datepicker-ru.js') }}"></script>#}
+    
+    {#{{ form_javascript(form) }}#}
+    <script src="{{ asset('js/jquery-2.2.4.min.js') }}"></script>
+    <!-- Modernizr javascript -->
+    <script src="{{ asset('js/modernizr.js') }}"></script>
+    <script src="{{ asset('js/toucheffects.js') }}"></script>        
+
+    <script src="{{ asset('js/select2.full.min.js') }}"></script>
+    
+    <script type="text/javascript">
+        
+    $(".js-example-basic-multiple").select2();
+    $(".js-example-basic-single").select2();
+    
+    
+    $("#stage_order_isLegalEntity").click( function(){
+        var contractor = $( "#stage_order_Contractor" );
+        var isp = $( "#stage_order_UserIsp" );
+        if( $(this).is(':checked') ) {
+            contractor.prop( "disabled", false );
+            isp.prop( "disabled", true );
+            contractor.closest(".form-group").show(1000);
+            isp.closest(".form-group").hide(1000);
+
+        } else {
+            contractor.prop( "disabled", true );
+            isp.prop( "disabled", false );
+            contractor.closest(".form-group").hide(1000);
+            isp.closest(".form-group").show(1000);
+        }
+     });
+    
+    </script>
+    {#
+    <script src="{{ asset('js/plugins/canvas-to-blob.min.js') }}" type="text/javascript"></script>
+    <!-- sortable.min.js is only needed if you wish to sort / rearrange files in initial preview.
+         This must be loaded before fileinput.min.js -->
+    <script src="{{ asset('js/plugins/sortable.min.js') }}" type="text/javascript"></script>
+    <!-- purify.min.js is only needed if you wish to purify HTML content in your preview for HTML files.
+         This must be loaded before fileinput.min.js -->
+    <script src="{{ asset('js/plugins/purify.min.js') }}" type="text/javascript"></script>
+    <!-- the main fileinput plugin file -->
+    <script src="{{ asset('js/fileinput.min.js') }}"></script> #}
+    <!-- bootstrap.js below is needed if you wish to zoom and view file content 
+        in a larger detailed modal dialog -->
+    <script src="{{ asset('js/bootstrap-3.3.7.min.js') }}"></script>
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/highlight.pack.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ asset('bundles/petkoparacrudgenerator/js/petkopara-crud-generator.js') }}"></script>
+
+    
+    <!-- optionally if you need a theme like font awesome theme you can include 
+       it as mentioned below -->
+    {#<script src="{{ asset('themes/fa/theme.js') }}"></script>#}
+    <!-- optionally if you need translation for your language then include 
+       locale file as mentioned below -->
+    {#<script src="{{ asset('js/locales/ru.js') }}"></script>#}
+    <script src="{{ asset('js/template.js') }}"></script>
+    
+      
+    
+    
+{% endblock %}
+

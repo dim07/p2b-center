@@ -23,6 +23,9 @@ class AppKernel extends Kernel
             new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
             new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
             new Petkopara\CrudGeneratorBundle\PetkoparaCrudGeneratorBundle(),
+//            new Genemu\Bundle\FormBundle\GenemuFormBundle(),
+            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+            
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

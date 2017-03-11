@@ -1,0 +1,45 @@
+orderpay:
+    path:  /
+    defaults: { _controller: "AppBundle:OrderPay:index" }
+
+orderpay_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:OrderPay:show" }
+
+orderpay_new:
+    path:  /{order_id}/new
+    defaults: { _controller: AppBundle:OrderPay:new, order_id: order_id }
+    requirements:
+        _method:  POST
+        order_id: \d+
+
+orderpay_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:OrderPay:create" }
+    requirements: { _method: post }
+
+orderpay_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:OrderPay:edit" }
+
+orderpay_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:OrderPay:update" }
+    requirements: { _method: post|put }
+
+orderpay_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:OrderPay:delete" }
+    requirements: { _method: post|delete }
+    
+orderpay_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:OrderPay:deleteById" }
+    requirements: { _method: get }
+    
+
+orderpay_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:OrderPay:bulk" }
+    requirements: { _method: post }
+    

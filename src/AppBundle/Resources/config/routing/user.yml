@@ -1,0 +1,42 @@
+user:
+    path:  /
+    defaults: { _controller: "AppBundle:User:index" }
+
+user_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:User:show" }
+
+user_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:User:new" }
+
+user_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:User:create" }
+    requirements: { _method: post }
+
+user_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:User:edit" }
+
+user_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:User:update" }
+    requirements: { _method: post|put }
+
+user_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:User:delete" }
+    requirements: { _method: post|delete }
+    
+user_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:User:deleteById" }
+    requirements: { _method: get }
+    
+
+user_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:User:bulk" }
+    requirements: { _method: post }
+    

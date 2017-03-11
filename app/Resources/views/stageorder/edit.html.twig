@@ -1,0 +1,126 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} -  Редактирование заказа
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header text-center">
+        <h2>Изменить данные заказа <span class="fa fa-edit" aria-hidden="true"></span></h2>
+        <ol class="breadcrumb">
+            <li>
+                <a class="btn btn-link" href="{{ path('project_edit', { 'id':  stageOrder.stage.idProject }) }}">
+                {{ stageOrder.stage.project.name }}
+                </a>
+            </li>
+            <li>
+                <a class="btn btn-link" href="{{ path('projectstage_edit', { 'id':  stageOrder.idStage }) }}">
+                    {{ stageOrder.stage.name }}
+                </a>
+            </li>   
+            <li class="active">
+                {{ stageOrder }}
+            </li>
+        </ol>
+        
+    </div>
+</div>
+
+{{ form_start(edit_form) }}    
+<div class ="col-md-12">
+    {% include "stageorder/_form.html.twig"   with {'form': edit_form} %}
+</div>      
+<div class="row text-center">
+    <button type="submit" class="btn btn-lg btn-primary">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Сохранить
+    </button>
+</div>
+{{ form_end(edit_form) }}
+
+<div class ="col-md-12">
+    <div class="row">
+        <div class="col-lg-6">
+            <button class="btn btn-lg btn-default" type="button" data-toggle="collapse" data-target="#collapsePays" aria-expanded="true" aria-controls="collapsePays">
+                Выплаты
+                <span class="caret"></span>
+            </button>
+        </div>    
+    </div>
+    <div class="row collapse in" id="collapsePays">    
+        <div class="col-md-6">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Создание выплаты</h3>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(new_pay_form, {'action': path('orderpay_new', { 'order_id': stageOrder.id }), 'method': 'post'}) }}
+                    {#{{ form_widget(new_stage_form) }}#}
+                    {% include "orderpay/_form.html.twig"   with {'form': new_pay_form} %}
+                    <p class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fa fa-plus" aria-hidden="true"></span> Добавить
+                        </button>
+                    </p>
+                    {{ form_end(new_pay_form) }} 
+                </div>
+            </div>
+
+        </div>    
+                
+        {% set s1 = 0 %}
+        {% set s2 = 0 %}
+        {% for pay in stageOrder.pays %}
+           {% if pay.factPay %} 
+               {% set s1 = s1 + pay.factPay %} 
+           {% endif %} 
+           {% if pay.planPay %} 
+               {% set s2 = s2 + pay.planPay %} 
+           {% endif %} 
+        {% endfor %}        
+        <div class="col-md-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title"><span class="badge pull-right">{{ s1 }} ({{ s2 }})</span>Список выплат</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                      {% for pay in stageOrder.pays %}
+                          <a href="{{ path('orderpay_edit', { 'id':  pay.id }) }}" class="list-group-item"><span class="badge">{{ pay.factPay }} ({{ pay.planPay }})</span>{{ pay.PayDate|date('d.m.Y') }}</a>
+                      {% endfor %}
+                    </div> 
+                </div>
+            </div>
+        </div>  
+    </div>
+</div>    
+
+   
+<hr/>
+
+    
+<div class="form-group col-md-12">
+    <a class="btn btn-default" href="{{ path('projectstage_edit', { 'id':  stageOrder.idStage }) }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Назад к этапу
+    </a>
+    {#<a class="btn btn-info" href="{{ path('stageorder_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>#}
+    <form action="{{ path('stageorder_delete', { 'id': stageOrder.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить заказ?');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Удалить заказ
+        </button>
+    </form>
+</div>
+
+</div>
+
+
+{% endblock %}
+

@@ -1,0 +1,33 @@
+{% extends "@FOSUser/layout.html.twig" %}
+
+{% block style %}
+{{ parent() }}    
+<style>
+.body_content {
+    margin-top: 8%;
+    background-color: #A6C6FF;
+    padding-bottom: 20px;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #3b5998;
+    max-width: 560px;
+}
+</style>
+{% endblock %}
+
+{% block title %}
+{{ parent() }} - Аутентификация пользователя
+{% endblock %}
+
+{% block body %}
+    
+    <div id="top" class="row">
+        <div class="page-header">
+            <h2 class="text-center">Аутентификация пользователя <span class="fa fa-user-circle-o" aria-hidden="true"></span> </h2>
+        </div>
+    </div>
+        
+    {% block fos_user_content %}
+        {{ include('@FOSUser/Security/login_content.html.twig') }}
+    {% endblock fos_user_content %}
+{% endblock %}

@@ -1,0 +1,28 @@
+<div class ="col-md-12">
+    {#{{ form_widget(form) }}#}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.planPay) }}
+        </div> 
+        <div class="col-md-6">
+            {{ form_row(form.factPay) }}
+        </div>
+    </div>    
+    <div class="row">    
+        <div class="col-md-4">
+            {{ form_row(form.statementDate) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.payDate) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.chargDate) }}
+        </div>
+    </div>
+      
+    <hr>
+                
+</div>    
+
+
+    

@@ -1,0 +1,42 @@
+portfolio:
+    path:  /
+    defaults: { _controller: "AppBundle:portfolio:index" }
+
+portfolio_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:portfolio:show" }
+
+portfolio_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:portfolio:new" }
+
+portfolio_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:portfolio:create" }
+    requirements: { _method: post }
+
+portfolio_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:portfolio:edit" }
+
+portfolio_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:portfolio:update" }
+    requirements: { _method: post|put }
+
+portfolio_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:portfolio:delete" }
+    requirements: { _method: post|delete }
+    
+portfolio_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:portfolio:deleteById" }
+    requirements: { _method: get }
+    
+
+portfolio_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:portfolio:bulk" }
+    requirements: { _method: post }
+    

@@ -1,0 +1,72 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} -  Редактировать выплату по заказу
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header text-center">
+        <h2>Изменить данные выплаты по заказу <span class="fa fa-edit " aria-hidden="true"></span></h2>
+        <ol class="breadcrumb">
+            <li>
+                <a class="btn btn-link" href="{{ path('project_edit', { 'id':  orderPay.order.stage.idProject }) }}">
+                {{ orderPay.order.stage.project.name }}
+                </a>
+            </li>
+            <li>
+                <a class="btn btn-link" href="{{ path('projectstage_edit', { 'id':  orderPay.order.idStage }) }}">
+                    {{ orderPay.order.stage.name }}
+                </a>
+            </li>   
+            <li>
+                <a class="btn btn-link" href="{{ path('stageorder_edit', { 'id':  orderPay.idOrder }) }}">
+                    {{ orderPay.order }}
+                </a>
+            </li>
+             <li class="active">
+                {{ orderPay }}
+            </li>
+        </ol>
+        
+    </div>
+</div>   
+
+    {{ form_start(edit_form) }}
+
+    {% include "orderpay/_form.html.twig"   with {'form': edit_form} %}
+    <div class="row text-center">
+        <button type="submit" class="btn btn-lg btn-primary">
+            <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
+        </button>
+    </div>
+    {{ form_end(edit_form) }}
+    
+    <hr/>
+
+    
+<div class="form-group">
+    <a class="btn btn-default" href="{{ path('stageorder_edit', { 'id':  orderPay.idOrder }) }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Вернуться к заказу
+    </a>
+    {#<a class="btn btn-info" href="{{ path('orderpay_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>#}
+    <form action="{{ path('orderpay_delete', { 'id': orderPay.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить выплату?');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Удалить выплату
+        </button>
+    </form>
+</div>
+
+</div>
+
+
+{% endblock %}
+

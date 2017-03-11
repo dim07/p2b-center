@@ -1,0 +1,39 @@
+app_project:
+    resource: "@AppBundle/Resources/config/routing/project.yml"
+    prefix:   /project
+    
+experts:
+    path:  /experts
+    defaults: { _controller: "AppBundle:User:experts" } 
+    
+subcontractors:
+    path:  /subcontractors
+    defaults: { _controller: "AppBundle:LegalEntity:subcontractors" }    
+    
+app_projectstage:
+        resource: "@AppBundle/Resources/config/routing/projectstage.yml"
+        prefix:   /projectstage
+
+app_portfolio:
+        resource: "@AppBundle/Resources/config/routing/portfolio.yml"
+        prefix:   /portfolio
+        
+app_legalentity:
+        resource: "@AppBundle/Resources/config/routing/legalentity.yml"
+        prefix:   /legalentity
+        
+app_stageorder:
+        resource: "@AppBundle/Resources/config/routing/stageorder.yml"
+        prefix:   /stageorder
+        
+app_user:
+        resource: "@AppBundle/Resources/config/routing/user.yml"
+        prefix:   /user        
+
+app_orderpay:
+        resource: "@AppBundle/Resources/config/routing/orderpay.yml"
+        prefix:   /orderpay
+        
+app_stageorderevent:
+        resource: "@AppBundle/Resources/config/routing/stageorderevent.yml"
+        prefix:   /stageorderevent        

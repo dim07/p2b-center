@@ -1,0 +1,56 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} -  Редактировать юрлицо
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Изменить данные юрлица пользователя {{ legalEntity.user.username }} <span class="fa fa-edit " aria-hidden="true"></span></h2>
+    </div>
+</div>
+
+   
+<div class="row">
+    {{ form_start(edit_form) }}
+
+    {% include "legalentity/_form.html.twig"   with {'form': edit_form} %}
+    <div class="container text-right">
+        <button type="submit" class="btn btn-primary">
+            <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
+        </button>
+    </div>
+    
+    {{ form_end(edit_form) }}
+</div>    
+    {#
+    <hr/>
+
+    
+<div class="form-group">
+    <a class="btn btn-default" href="{{ path('legalentity') }}">
+        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+        Back to list
+    </a>
+    <a class="btn btn-info" href="{{ path('legalentity_new') }}">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        New
+    </a>
+    <form action="{{ path('legalentity_delete', { 'id': legalEntity.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Delete
+        </button>
+    </form>
+</div>
+    #}
+
+
+
+
+{% endblock %}
+

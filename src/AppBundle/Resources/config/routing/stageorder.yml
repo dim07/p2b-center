@@ -1,0 +1,46 @@
+stageorder:
+    path:  /
+    defaults: { _controller: "AppBundle:StageOrder:index" }
+
+stageorder_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:StageOrder:show" }
+
+stageorder_new:
+    path:  /{stage_id}/new/{redir_proj}
+    defaults: { _controller: AppBundle:StageOrder:new, stage_id: stage_id, redir_proj: 0 }
+    requirements:
+        _method:  POST
+        stage_id: \d+
+        redir_proj: \d+
+
+stageorder_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:StageOrder:create" }
+    requirements: { _method: post }
+
+stageorder_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:StageOrder:edit" }
+
+stageorder_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:StageOrder:update" }
+    requirements: { _method: post|put }
+
+stageorder_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:StageOrder:delete" }
+    requirements: { _method: post|delete }
+    
+stageorder_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:StageOrder:deleteById" }
+    requirements: { _method: get }
+    
+
+stageorder_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:StageOrder:bulk" }
+    requirements: { _method: post }
+    

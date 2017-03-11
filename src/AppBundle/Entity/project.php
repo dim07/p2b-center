@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * project
@@ -36,7 +38,7 @@ class project
     private $CustomerId;
     
     /**
-     * @ORM\OneToOne(targetEntity="LegalEntity")
+     * @ORM\ManyToOne(targetEntity="LegalEntity", inversedBy="customprojects")
      * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
      */
     private $Customer;
@@ -49,12 +51,31 @@ class project
     private $ContractorId;
     
     /**
-     * @ORM\OneToOne(targetEntity="LegalEntity")
+     * @ORM\ManyToOne(targetEntity="LegalEntity", inversedBy="contractprojects")
      * @ORM\JoinColumn(name="contractor_id", referencedColumnName="id")
      */
     private $Contractor;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="nofot", type="float", nullable=true)
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 1,
+     *      minMessage = "Значение не может быть меньше {{ limit }}",
+     *      maxMessage = "Значение не может быть больше {{ limit }}"
+     * )
+     */
+    private $nofot;
+
+     /**
+     * @ORM\OneToMany(targetEntity="ProjectStage", mappedBy="project")
+     * @ORM\OrderBy({"num" = "ASC"})
+     */
+    private $stages;
+    
+        /**
      * @var int
      *
      * @ORM\Column(name="gip_id", type="integer", nullable=true)
@@ -62,29 +83,10 @@ class project
     private $GipId;
     
     /**
-     * @ORM\OneToOne(targetEntity="NaturPers")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="gipprojects")
      * @ORM\JoinColumn(name="gip_id", referencedColumnName="id")
      */
-    private $Gip;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="nofot", type="float", nullable=true)
-     */
-    private $nofot;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="info", type="text", nullable=true)
-     */
-    private $info;
-    
-     /**
-     * @ORM\OneToMany(targetEntity="ProjectStage", mappedBy="project")
-     */
-    private $stages;
+    private $gip;
     
     public function __construct()
     {
@@ -174,30 +176,6 @@ class project
     }
 
     /**
-     * Set gipId
-     *
-     * @param integer $gipId
-     *
-     * @return project
-     */
-    public function setGipId($gipId)
-    {
-        $this->GipId = $gipId;
-
-        return $this;
-    }
-
-    /**
-     * Get gipId
-     *
-     * @return integer
-     */
-    public function getGipId()
-    {
-        return $this->GipId;
-    }
-
-    /**
      * Set nofot
      *
      * @param float $nofot
@@ -221,30 +199,7 @@ class project
         return $this->nofot;
     }
 
-    /**
-     * Set info
-     *
-     * @param string $info
-     *
-     * @return project
-     */
-    public function setInfo($info)
-    {
-        $this->info = $info;
-
-        return $this;
-    }
-
-    /**
-     * Get info
-     *
-     * @return string
-     */
-    public function getInfo()
-    {
-        return $this->info;
-    }
-
+    
     /**
      * Set customer
      *
@@ -293,29 +248,6 @@ class project
         return $this->Contractor;
     }
 
-    /**
-     * Set gip
-     *
-     * @param \AppBundle\Entity\NaturPers $gip
-     *
-     * @return project
-     */
-    public function setGip(\AppBundle\Entity\NaturPers $gip = null)
-    {
-        $this->Gip = $gip;
-
-        return $this;
-    }
-
-    /**
-     * Get gip
-     *
-     * @return \AppBundle\Entity\NaturPers
-     */
-    public function getGip()
-    {
-        return $this->Gip;
-    }
 
     /**
      * Add stage
@@ -350,4 +282,59 @@ class project
     {
         return $this->stages;
     }
+
+    /**
+     * Set gipId
+     *
+     * @param integer $gipId
+     *
+     * @return project
+     */
+    public function setGipId($gipId)
+    {
+        $this->GipId = $gipId;
+
+        return $this;
+    }
+
+    /**
+     * Get gipId
+     *
+     * @return integer
+     */
+    public function getGipId()
+    {
+        return $this->GipId;
+    }
+
+    /**
+     * Set gip
+     *
+     * @param \AppBundle\Entity\User $gip
+     *
+     * @return project
+     */
+    public function setGip(\AppBundle\Entity\User $gip = null)
+    {
+        $this->gip = $gip;
+
+        return $this;
+    }
+
+    /**
+     * Get gip
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getGip()
+    {
+        return $this->gip;
+    }
+    
+    public function __toString() 
+    {
+        return $this->getName();
+    }
+    
+    
 }

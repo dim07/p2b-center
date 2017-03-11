@@ -1,0 +1,34 @@
+{% extends 'myforms.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Создание юрлица
+{% endblock %}
+
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Создание юрлица для пользователя {{ legalEntity.user.username }}<span class="fa fa-plus-circle" aria-hidden="true"></span> </h2>
+    </div>
+</div>
+    
+<div class="row">
+      
+{{ form_start(form) }}
+
+{% include "legalentity/_form.html.twig"  with {'form': form} %}
+
+    <hr/>
+    <div class="container text-right">
+        <button type="submit" name="submit" value="save" class="btn btn-primary"> 
+             <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
+        </button>
+    </div>
+{{ form_end(form) }}    
+
+
+</div>
+
+
+{% endblock %}
+

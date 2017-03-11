@@ -1,0 +1,42 @@
+stageorderevent:
+    path:  /
+    defaults: { _controller: "AppBundle:StageOrderEvent:index" }
+
+stageorderevent_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:StageOrderEvent:show" }
+
+stageorderevent_new:
+    path:  /new
+    defaults: { _controller: "AppBundle:StageOrderEvent:new" }
+
+stageorderevent_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:StageOrderEvent:create" }
+    requirements: { _method: post }
+
+stageorderevent_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:StageOrderEvent:edit" }
+
+stageorderevent_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:StageOrderEvent:update" }
+    requirements: { _method: post|put }
+
+stageorderevent_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:StageOrderEvent:delete" }
+    requirements: { _method: post|delete }
+    
+stageorderevent_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:StageOrderEvent:deleteById" }
+    requirements: { _method: get }
+    
+
+stageorderevent_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:StageOrderEvent:bulk" }
+    requirements: { _method: post }
+    

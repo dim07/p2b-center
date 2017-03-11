@@ -5,12 +5,15 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Doctrine\Common\Collections\ArrayCollection;
 
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="fos_user")
+ * @ORM\HasLifecycleCallbacks()
  * @Vich\Uploadable
  */
 class User extends BaseUser
@@ -32,19 +35,39 @@ class User extends BaseUser
     protected $groups;
     
     /**
-     * @ORM\Column(type="string", length=255)
+     * Many Users have Many Sections.
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Section", inversedBy="users")
+     * @ORM\JoinTable(name="fos_user_section")
+     */
+    protected $sections;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="project", mappedBy="gip", cascade={"persist", "remove"})
+     */
+    private $gipprojects;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="UserIsp")
+     */
+    private $orders;
+    
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string
      */
     private $avatar;
     
     /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     * @Assert\File(maxSize="400k",mimeTypes={"image/png", "image/jpeg", "image/pjpeg"})
      * @Vich\UploadableField(mapping="avatar_images", fileNameProperty="avatar")
+     *
      * @var File
      */
     private $imageFile;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      * @var \DateTime
      */
     private $updatedAt;
@@ -55,16 +78,53 @@ class User extends BaseUser
      */
     private $legentity;
     
-     /**
-     * 
-     * @ORM\OneToOne(targetEntity="NaturPers", mappedBy="user")
-     */
-    private $pers;
-    
+        
     /**
      * @ORM\OneToMany(targetEntity="portfolio", mappedBy="user")
      */
     private $folios;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="fio", type="string", length=255)
+     */
+    private $fio;
+    
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="HideName", type="boolean", nullable=true)
+     */
+    private $hideName;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="phone", type="string", length=100, nullable=true)
+     */
+    private $phone;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="rating", type="integer", nullable=true)
+     */
+    private $rating;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="region", type="string", length=255, nullable=true)
+     */
+    private $region;
+    
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="agreement", type="string", length=255, nullable=true)
+     */
+    private $agreement;
 
     public function setUpdatedAt($updatedAt)
     {
@@ -110,96 +170,10 @@ class User extends BaseUser
     {
         parent::__construct();
         $this->folios = new ArrayCollection();
+        $this->sections = new ArrayCollection();
+        $this->gipprojects = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
-
-//    public function getId()
-//    {
-//        return $this->id;
-//    }
-//
-//    public function getUsername()
-//    {
-//        return $this->username;
-//    }
-//
-//    /**
-//     * @param string $username
-//     */
-//    public function setUsername($username)
-//    {
-//        $this->username = $username;
-//    }
-//
-//    public function getEmail()
-//    {
-//        return $this->email;
-//    }
-//
-//    /**
-//     * @param string $email
-//     */
-//    public function setEmail($email)
-//    {
-//        $this->email = $email;
-//    }
-//
-//    public function getPassword()
-//    {
-//        return $this->password;
-//    }
-//
-//    /**
-//     * @param string $password
-//     */
-//    public function setPassword($password)
-//    {
-//        $this->password = $password;
-//    }
-//
-//    /**
-//     * Returns the roles or permissions granted to the user for security.
-//     */
-//    public function getRoles()
-//    {
-//        $roles = $this->roles;
-//
-//        // guarantees that a user always has at least one role for security
-//        if (empty($roles)) {
-//            $roles[] = 'ROLE_USER';
-//        }
-//
-//        return array_unique($roles);
-//    }
-//
-//    public function setRoles(array $roles)
-//    {
-//        $this->roles = $roles;
-//    }
-//
-//    /**
-//     * Returns the salt that was originally used to encode the password.
-//     *
-//     * {@inheritdoc}
-//     */
-//    public function getSalt()
-//    {
-//        // See "Do you need to use a Salt?" at http://symfony.com/doc/current/cookbook/security/entity_provider.html
-//        // we're using bcrypt in security.yml to encode the password, so
-//        // the salt value is built-in and you don't have to generate one
-//
-//        return null;
-//    }
-//
-//    /**
-//     * Removes sensitive data from the user.
-//     *
-//     * {@inheritdoc}
-//     */
-//    public function eraseCredentials()
-//    {
-//        // if you had a plainPassword property, you'd nullify it here
-//        // $this->plainPassword = null;
-//    }
 
     /**
      * Set legentity
@@ -225,30 +199,7 @@ class User extends BaseUser
         return $this->legentity;
     }
 
-    /**
-     * Set pers
-     *
-     * @param \AppBundle\Entity\NaturPers $pers
-     *
-     * @return User
-     */
-    public function setPers(\AppBundle\Entity\NaturPers $pers = null)
-    {
-        $this->pers = $pers;
-
-        return $this;
-    }
-
-    /**
-     * Get pers
-     *
-     * @return \AppBundle\Entity\NaturPers
-     */
-    public function getPers()
-    {
-        return $this->pers;
-    }
-
+    
     /**
      * Add folio
      *
@@ -281,5 +232,278 @@ class User extends BaseUser
     public function getFolios()
     {
         return $this->folios;
+    }
+
+    /**
+     * Set fio
+     *
+     * @param string $fio
+     *
+     * @return User
+     */
+    public function setFio($fio)
+    {
+        $this->fio = $fio;
+
+        return $this;
+    }
+
+    /**
+     * Get fio
+     *
+     * @return string
+     */
+    public function getFio()
+    {
+        return $this->fio;
+    }
+
+    /**
+     * Set hideName
+     *
+     * @param boolean $hideName
+     *
+     * @return User
+     */
+    public function setHideName($hideName)
+    {
+        $this->hideName = $hideName;
+
+        return $this;
+    }
+
+    /**
+     * Get hideName
+     *
+     * @return boolean
+     */
+    public function getHideName()
+    {
+        return $this->hideName;
+    }
+
+    /**
+     * Set phone
+     *
+     * @param string $phone
+     *
+     * @return User
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get phone
+     *
+     * @return string
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Set rating
+     *
+     * @param integer $rating
+     *
+     * @return User
+     */
+    public function setRating($rating)
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    /**
+     * Get rating
+     *
+     * @return integer
+     */
+    public function getRating()
+    {
+        return $this->rating;
+    }
+
+    /**
+     * Set region
+     *
+     * @param string $region
+     *
+     * @return User
+     */
+    public function setRegion($region)
+    {
+        $this->region = $region;
+
+        return $this;
+    }
+
+    /**
+     * Get region
+     *
+     * @return string
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * Set agreement
+     *
+     * @param string $agreement
+     *
+     * @return User
+     */
+    public function setAgreement($agreement)
+    {
+        $this->agreement = $agreement;
+
+        return $this;
+    }
+
+    /**
+     * Get agreement
+     *
+     * @return string
+     */
+    public function getAgreement()
+    {
+        return $this->agreement;
+    }
+
+    /**
+     * Add section
+     *
+     * @param \AppBundle\Entity\Section $section
+     *
+     * @return User
+     */
+    public function addSection(\AppBundle\Entity\Section $section)
+    {
+        $this->sections[] = $section;
+
+        return $this;
+    }
+
+    /**
+     * Remove section
+     *
+     * @param \AppBundle\Entity\Section $section
+     */
+    public function removeSection(\AppBundle\Entity\Section $section)
+    {
+        $this->sections->removeElement($section);
+    }
+
+    /**
+     * Get sections
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSections()
+    {
+        return $this->sections;
+    }
+    
+    public function getSectionslist()
+    {
+        $html = '<ul>';
+        $secs = $this->sections;
+        foreach ($secs as $sec) {
+            $html = $html.'<li>'.$sec->getName().'</li>';
+        }
+        $html = $html.'</ul>';
+        
+        return $html;
+    }
+
+    /**
+     * Add gipproject
+     *
+     * @param \AppBundle\Entity\project $gipproject
+     *
+     * @return User
+     */
+    public function addGipproject(\AppBundle\Entity\project $gipproject)
+    {
+        $this->gipprojects[] = $gipproject;
+
+        return $this;
+    }
+
+    /**
+     * Remove gipproject
+     *
+     * @param \AppBundle\Entity\project $gipproject
+     */
+    public function removeGipproject(\AppBundle\Entity\project $gipproject)
+    {
+        $this->gipprojects->removeElement($gipproject);
+    }
+
+    /**
+     * Get gipprojects
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getGipprojects()
+    {
+        return $this->gipprojects;
+    }
+    
+    public function getGipprojectscount()
+    {
+        return count($this->gipprojects);
+    }
+
+    /**
+     * Add order
+     *
+     * @param \AppBundle\Entity\StageOrder $order
+     *
+     * @return User
+     */
+    public function addOrder(\AppBundle\Entity\StageOrder $order)
+    {
+        $this->orders[] = $order;
+
+        return $this;
+    }
+
+    /**
+     * Remove order
+     *
+     * @param \AppBundle\Entity\StageOrder $order
+     */
+    public function removeOrder(\AppBundle\Entity\StageOrder $order)
+    {
+        $this->orders->removeElement($order);
+    }
+
+    /**
+     * Get orders
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getOrders()
+    {
+        return $this->orders;
+    }
+    
+    public function getOrderscount()
+    {
+        return count($this->orders);
+    }
+    
+    public function __toString() 
+    {
+        return $this->getUsername();
     }
 }

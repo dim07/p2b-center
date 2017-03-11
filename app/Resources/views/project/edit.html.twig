@@ -1,0 +1,236 @@
+{% extends 'myforms.html.twig' %}
+
+{% set stages = project.stages %}
+
+{% block title %}
+{{ parent() }} -  Редактировать проект
+{% endblock %}
+{#
+{% block datetime_widget %}
+    <div class="date_widget input-group date js-datepicker">
+        {{ block('form_widget_simple') }}
+    </div>
+{% endblock %}
+#}
+{% block body %}
+
+<div id="top" class="row">
+    <div class="page-header">
+        <h2 class="text-center">Изменить данные проекта <span class="fa fa-edit " aria-hidden="true"></span></h2>
+    </div>
+</div>
+<div class="row"> 
+    {#{% form_theme 
+        edit_form 
+            'jquery.collection.html.twig' 
+    %}#}
+    {{ form_start(edit_form) }}
+
+    {% include "project/_form.html.twig"   with {'form': edit_form} %}
+
+               
+    <div class="row text-center">
+        <button type="submit" class="btn btn-primary">
+            <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
+        </button>
+    </div>
+    <br>
+    
+    {{ form_end(edit_form) }}
+    
+            
+    <!-- Modal -->
+    <div class="modal fade" id="add_stage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                {{ form_start(new_stage_form, {'action': path('projectstage_new', { 'proj_id': project.id }), 'method': 'post'}) }}
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Новый этап проекта</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_row(new_stage_form.name) }}
+                    <div class="row">
+                        <div class="col-md-4">{{ form_row(new_stage_form.num) }}</div>
+                        <div class="col-md-4">{{ form_row(new_stage_form.cost) }}</div>
+                        <div class="col-md-4">{{ form_row(new_stage_form.endDate) }}</div>
+                    </div>    
+                    {{ form_row(new_stage_form.info) }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fa fa-save" aria-hidden="true"></span> Сохранить
+                    </button>        
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                </div>
+                {{ form_end(new_stage_form) }} 
+            </div>
+      </div>
+    </div>
+            
+           
+            
+    <div class ="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Структура проекта
+                    <button class="btn btn-xs btn-primary pull-right" data-toggle="modal" data-target="#add_stage">
+                        Добавить этап&nbsp;
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </h3>    
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr><th>&nbsp;</th>
+                            <th>№</th>
+                            <th>Наименование</th>
+                            <th>Дата завершения</th>
+                            <th>Стоимость руб. с НДС</th>
+                            <th>Заказов</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for stage in stages %}
+                            
+                        <!-- Modal -->
+                        <div class="modal fade" id="add_order_{{ stage.id }}" {#tabindex="-1"#} role="dialog" aria-labelledby="myModalLabe2">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    {% set ind = 'order' ~ stage.id %}
+                                    {{ form_start(forms[ind], {'action': path('stageorder_new', { 'stage_id': stage.id, 'redir_proj': 1 }), 'method': 'post'}) }}
+                                    <div class="modal-header">
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                      <h4 class="modal-title" id="myModalLabel">Новый заказ для этапа №{{ stage.num }}</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        
+                                        {% include "stageorder/_form.html.twig"   with {'form': forms[ind]} %}
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="fa fa-save" aria-hidden="true"></span> Сохранить
+                                        </button>        
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                                    </div>
+                                    {{ form_rest(forms[ind]) }}
+                                    {{ form_end(forms[ind]) }} 
+                                </div>
+                            </div>
+                        </div>     
+                            
+                        <tr class="accordion-toggle"> 
+                            <td><button id="eye-{{ stage.id }}" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#stage-{{ stage.id }}"><i class="fa fa-eye"></i></button></td>
+                            <td>{{ stage.num }}.</td>
+                            <td>{{ stage.name }}</td>
+                            <td>{{ stage.endDate|date('d.m.Y') }}</td>
+                            <td>{{ stage.cost }}</td>
+                            <td><span class="badge">{{ stage.orders|length }}</span></td>
+                            <td><a href="{{ path('projectstage_edit', { 'id':  stage.id }) }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> </a></td>
+                        </tr>
+                        <tr>
+                            <td colspan="12" class="hiddenRow">
+                                <div class="accordian-body collapse" id="stage-{{ stage.id }}"> 
+                                    {% set orders = stage.orders %}    
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                          <h3 class="panel-title">Список заказов для этапа №{{ stage.num }}
+                                                <button class="btn btn-xs btn-primary pull-right" data-toggle="modal" data-target="#add_order_{{ stage.id }}">
+                                                    Добавить заказ&nbsp;
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                          </h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            
+                                            <table class="table table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th>&nbsp;</th>
+                                                        <th>ID</th>
+                                                        <th>Раздел</th>
+                                                        <th>Стоимость, план, руб </th>
+                                                        <th>Дата начала</th>
+                                                        <th>Дата завершения, план</th>
+                                                        <th>Исполнитель</th>
+                                                        <th>Подрядчик</th>
+                                                        <th>&nbsp;</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for order in orders %}
+                                                    <tr>
+                                                        <td><button id="eye-order-{{ order.id }}" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#order-{{ order.id }}"><i class="fa fa-eye"></i></button></td>
+                                                        <td>{{ order.id }}</td>
+                                                        <td>{{ order }}</td>
+                                                        <td>{{ order.cost }}</td>
+                                                        <td>{{ order.startDate ? order.startDate|date('d.m.Y') }}</td>
+                                                        <td>{{ order.endDate ? order.endDate|date('d.m.Y') }}</td>
+                                                        <td>{{ order.UserIsp ? order.UserIsp.fio }}</td>
+                                                        <td>{{ order.Contractor ? order.Contractor }}</td>
+                                                        <td><a href="{{ path('stageorder_edit', { 'id':  order.id }) }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> </a></td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                    
+                                </div> 
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+    </div> 
+    
+</div>
+<hr/>
+
+    
+<div class="form-group">
+    <a class="btn btn-default" href="{{ path('project') }}">
+        <span class="fa fa-list" aria-hidden="true"></span>
+        К списку проектов
+    </a>
+    <a class="btn btn-info" href="{{ path('project_new') }}">
+        <span class="fa fa-plus" aria-hidden="true"></span>
+        Новый
+    </a>
+    <form action="{{ path('project_delete', { 'id': project.id }) }}" method="post" style="display: inline-block">
+        <input type="hidden" name="_method" value="DELETE" />
+        {{ form_widget(delete_form) }}
+        <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить проект?');">
+            <span class="fa fa-remove" aria-hidden="true"></span>
+            Удалить проект
+        </button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block javascripts %} 
+    {{ parent() }}
+   {# {% for stage in stages %}
+        $('#stage-{{ stage.id }}').on('shown.bs.collapse', function () {
+            $("#eye-{{ stage.id }} span.glyphicon").removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");
+        });
+        $('#stage-{{ stage.id }}').on('hidden.bs.collapse', function () {
+            $("#eye-{{ stage.id }} span.glyphicon").removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close");
+        });
+    {% endfor %} #}
+ {#   <script src="{{ asset('js/jquery.collection.js') }}"></script>
+
+    <script type="text/javascript">
+        $('.my-selectorStage').collection();
+    </script> #}
+{% endblock %}

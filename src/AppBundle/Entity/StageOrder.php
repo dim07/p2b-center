@@ -3,6 +3,9 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * StageOrder
@@ -29,7 +32,7 @@ class StageOrder
     private $idSection;
     
     /**
-     * @ORM\OneToOne(targetEntity="Section")
+     * @ORM\ManyToOne(targetEntity="Section", inversedBy="orders")
      * @ORM\JoinColumn(name="id_section", referencedColumnName="id")
      */
     private $section;
@@ -44,7 +47,7 @@ class StageOrder
     /**
      * @var bool
      *
-     * @ORM\Column(name="IsLegalEntity", type="boolean")
+     * @ORM\Column(name="IsLegalEntity", type="boolean", nullable=true)
      */
     private $isLegalEntity;
 
@@ -56,15 +59,20 @@ class StageOrder
     private $AfterOrderId;
     
      /**
-     * @ORM\OneToOne(targetEntity="StageOrder")
+     * @ORM\ManyToOne(targetEntity="StageOrder", inversedBy="beforeorders")
      * @ORM\JoinColumn(name="after_order_id", referencedColumnName="id")
      */
     private $AfterOrder;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="AfterOrder")
+     */
+    private $beforeorders;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="cost", type="float")
+     * @ORM\Column(name="cost", type="float", nullable=true)
      */
     private $cost;
 
@@ -124,7 +132,7 @@ class StageOrder
     private $ContractorId;
     
     /**
-     * @ORM\OneToOne(targetEntity="LegalEntity")
+     * @ORM\ManyToOne(targetEntity="LegalEntity", inversedBy="contractorders")
      * @ORM\JoinColumn(name="contractor_id", referencedColumnName="id")
      */
     private $Contractor;
@@ -134,16 +142,17 @@ class StageOrder
      *
      * @ORM\Column(name="pers_id", type="integer", nullable=true)
      */
-    private $PersId;
+    private $UserId;
     
     /**
-     * @ORM\OneToOne(targetEntity="NaturPers")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="orders")
      * @ORM\JoinColumn(name="pers_id", referencedColumnName="id")
      */
-    private $Pers;
+    private $UserIsp;
 
      /**
      * @ORM\OneToMany(targetEntity="OrderPay", mappedBy="order")
+     * @ORM\OrderBy({"payDate" = "ASC"})
      */
     private $pays;
     
@@ -152,10 +161,15 @@ class StageOrder
      */
     private $events;
     
+    private $Project;
+        
+    private $Customer;    
+    
     public function __construct()
     {
         $this->pays = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->beforeorders = new ArrayCollection();
     }
     
     /**
@@ -237,7 +251,11 @@ class StageOrder
      */
     public function getIsLegalEntity()
     {
-        return $this->isLegalEntity;
+        if (null !== $this->isLegalEntity) {
+            return $this->isLegalEntity;
+        } else {
+            return FALSE;    
+        }    
     }
 
     /**
@@ -666,5 +684,126 @@ class StageOrder
     public function getEvents()
     {
         return $this->events;
+    }
+
+    /**
+     * Set userId
+     *
+     * @param integer $userId
+     *
+     * @return StageOrder
+     */
+    public function setUserId($userId)
+    {
+        $this->UserId = $userId;
+
+        return $this;
+    }
+
+    /**
+     * Get userId
+     *
+     * @return integer
+     */
+    public function getUserId()
+    {
+        return $this->UserId;
+    }
+
+    /**
+     * Set userIsp
+     *
+     * @param \AppBundle\Entity\User $userIsp
+     *
+     * @return StageOrder
+     */
+    public function setUserIsp(\AppBundle\Entity\User $userIsp = null)
+    {
+        $this->UserIsp = $userIsp;
+
+        return $this;
+    }
+
+    /**
+     * Get userIsp
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUserIsp()
+    {
+        return $this->UserIsp;
+    }
+    
+    public function __toString()
+    {
+        return $this->section->getName();
+    }
+
+    /**
+     * Add beforeorder
+     *
+     * @param \AppBundle\Entity\StageOrder $beforeorder
+     *
+     * @return StageOrder
+     */
+    public function addBeforeorder(\AppBundle\Entity\StageOrder $beforeorder)
+    {
+        $this->beforeorders[] = $beforeorder;
+
+        return $this;
+    }
+
+    /**
+     * Remove beforeorder
+     *
+     * @param \AppBundle\Entity\StageOrder $beforeorder
+     */
+    public function removeBeforeorder(\AppBundle\Entity\StageOrder $beforeorder)
+    {
+        $this->beforeorders->removeElement($beforeorder);
+    }
+
+    /**
+     * Get beforeorders
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getBeforeorders()
+    {
+        return $this->beforeorders;
+    }
+    
+    /**
+     * Get Customer
+     *
+     * @return String
+     */
+    public function getCustomer()
+    {
+        return $this->stage->GetProject()->GetCustomer()->GetName();
+    }
+    
+    /**
+     * Get Project
+     *
+     * @return String
+     */
+    public function getProject()
+    {
+        return $this->stage->GetProject()->GetName();
+    }
+    
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        if (!$this->getIsLegalEntity() && null !== $this->getUserId() ) {
+            if (!$this->getUserIsp()->getSections()->contains($this->getSection())) {
+               $context->buildViolation('Выбранный исполнитель не имеет раздела специализации, который указан в заказе!')
+                ->atPath('UserIsp')
+                ->addViolation(); 
+            }
+        }
     }
 }
