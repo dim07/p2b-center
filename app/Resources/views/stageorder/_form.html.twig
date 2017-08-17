@@ -1,15 +1,20 @@
 <div class ="col-md-12">
     {#{{ form_widget(form) }}#}
+    
     {{ form_row(form.section) }}
-
+    {{ form_row(form.name) }}
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ form_row(form.startDate) }}
         </div> 
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ form_row(form.factEndDate) }}
         </div>
+        <div class="col-md-4">
+            {{ form_row(form.cost) }}
+        </div>
     </div>    
+    
     <div class="row">    
         <div class="col-md-6">
             {{ form_row(form.isPublic) }}
@@ -26,12 +31,14 @@
             {{ form_row(form.Contractor) }}
         </div>     
     </div>
+       
     {{ form_row(form.AfterOrder) }}    
     <div class="row ">
         <div class="col-md-12">
             {{ form_row(form.info) }}
         </div>   
-    </div>    
+    </div> 
+ 
     <hr>
                 
 </div>    

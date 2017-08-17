@@ -30,4 +30,11 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/user/, role: ROLE_ADMIN }
+        - { path: ^/project/, role: ROLE_USER }
+        - { path: ^/projectstage/, role: ROLE_USER }
+        - { path: ^/legalentity/, role: ROLE_USER }
+        - { path: ^/stageorder/, role: ROLE_USER }
+        - { path: ^/orderpay/, role: ROLE_USER }
+        - { path: ^/stageorderevent /, role: ROLE_USER }
+        - { path: ^/offer/, role: ROLE_USER }
         

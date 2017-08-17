@@ -33,13 +33,21 @@ class StageOrderEvent
      * @ORM\JoinColumn(name="id_order", referencedColumnName="id")
      */
     private $order;
-
+    
     /**
      * @var int
      *
      * @ORM\Column(name="id_event_type", type="integer")
      */
     private $idEventType;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\EventType")
+     * @ORM\JoinColumn(name="id_event_type", referencedColumnName="id")
+     */
+    private $EventType;
+    
+    
 
     /**
      * @var \DateTime
@@ -55,17 +63,10 @@ class StageOrderEvent
      */
     private $info;
 
+   
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id_file", type="integer", nullable=true)
-     */
-    private $idFile;
-    
-    /**
-     * @ORM\OneToOne(targetEntity="UserFile")
-     * @ORM\JoinColumn(name="id_file", referencedColumnName="id")
-     */
+    * @ORM\Column(name="file",type="string", length=255, nullable=true)
+    */
     private $File;
 
 
@@ -175,29 +176,6 @@ class StageOrderEvent
         return $this->info;
     }
 
-    /**
-     * Set idFile
-     *
-     * @param integer $idFile
-     *
-     * @return StageOrderEvent
-     */
-    public function setIdFile($idFile)
-    {
-        $this->idFile = $idFile;
-
-        return $this;
-    }
-
-    /**
-     * Get idFile
-     *
-     * @return int
-     */
-    public function getIdFile()
-    {
-        return $this->idFile;
-    }
 
     /**
      * Set order
@@ -223,14 +201,40 @@ class StageOrderEvent
         return $this->order;
     }
 
+    
+
     /**
-     * Set file
+     * Set eventType
      *
-     * @param \AppBundle\Entity\UserFile $file
+     * @param \EventType $eventType
      *
      * @return StageOrderEvent
      */
-    public function setFile(\AppBundle\Entity\UserFile $file = null)
+    public function setEventType(\AppBundle\Entity\EventType $eventType)
+    {
+        $this->EventType = $eventType;
+
+        return $this;
+    }
+
+    /**
+     * Get eventType
+     *
+     * @return \EventType
+     */
+    public function getEventType()
+    {
+        return $this->EventType;
+    }
+
+    /**
+     * Set file
+     *
+     * @param string $file
+     *
+     * @return StageOrderEvent
+     */
+    public function setFile($file)
     {
         $this->File = $file;
 
@@ -240,7 +244,7 @@ class StageOrderEvent
     /**
      * Get file
      *
-     * @return \AppBundle\Entity\UserFile
+     * @return string
      */
     public function getFile()
     {

@@ -5,7 +5,21 @@ project:
 project_show:
     path:  /{id}/show
     defaults: { _controller: "AppBundle:project:show" }
-
+    
+project_report_money:
+    path:  /{id}/report1
+    defaults: { _controller: "AppBundle:project:reportMoney" }    
+    
+project_statements:
+    path:  /{id}/statements
+    defaults: { _controller: "AppBundle:project:statements" }     
+    requirements: { _method: post|get }
+    
+project_pays_confirm:
+    path:  /{id}/pays-confirm
+    defaults: { _controller: "AppBundle:project:paysConfirm" }     
+    requirements: { _method: post|get }    
+    
 project_new:
     path:  /new
     defaults: { _controller: "AppBundle:project:new" }

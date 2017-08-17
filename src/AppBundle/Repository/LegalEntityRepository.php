@@ -10,4 +10,188 @@ namespace AppBundle\Repository;
  */
 class LegalEntityRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function personalFromPeriodWithPays($legId, $d1, $d2, $approved)
+    {
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT DISTINCT u.fio as fio, SUM(p.factPay) as summa FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' JOIN o.UserIsp u'.
+                    ' JOIN o.stage s'.
+                    ' JOIN s.project j'.
+//                    ' WHERE (j.CustomerId='.$legId.' OR j.ContractorId='.$legId.') AND p.payDate >= :d1 AND p.payDate <= :d2'.
+                    ' WHERE j.ContractorId='.$legId.' AND ((p.payDate >= :d1 AND p.payDate <= :d2)'.        
+                    (($approved) ? '' : 'OR (p.statementDate >= :d1 AND p.statementDate <= :d2)').
+                    ') AND (o.isLegalEntity IS NULL OR o.isLegalEntity = 0)'.
+                    ' GROUP BY fio ORDER BY fio'
+            ) ->setParameter('d1', $d1)->setParameter('d2', $d2)
+            ->getResult();
+        
+        // Формирование массива с месяцами
+        $mns = array();
+        $intervalM = new \DateInterval('P1M');
+        for ($i = 1; $i <= 13; $i++) {
+            $d1->add($intervalM);
+            $mns[] = $d1->format('m.y');
+        }
+        
+        $persTable = array(); 
+        foreach ($results as $result) {
+            $pers = array();
+            $pers['fio'] = $result['fio'];
+            $pers['summa'] = $result['summa'];
+            for ($i = 0; $i <= 12; $i++) {
+                $pers[$mns[$i]] = 0;
+            }
+            $persTable[] = $pers;
+        }
+
+        return $persTable;
+    }
+    
+    public function paysIspLastYearGroupedByMonthWithCurPlan($legId, $approved)
+    {
+//        $pays = array();
+        $d1 = (new \DateTime('-1 year -1 month'))->modify('first day of this month');
+//        $d2 = new \DateTime('last day of previous month');  
+        if ($approved) {
+            $d2 = new \DateTime('last day of this month');
+        } else {
+            $d2 = new \DateTime('last day of next month');
+        }    
+        $d2->setTime(23,59,59);
+        $qb = $this->getEntityManager()
+            ->createQuery(
+            'SELECT'. (($approved) ?
+            ' SUM(p.factPay) as summa,' :        
+            ' SUM(CASE WHEN (SUBSTRING(p.statementDate,1,7) = SUBSTRING(:today,1,7) OR SUBSTRING(p.statementDate,1,7) = SUBSTRING(:next,1,7)) THEN p.planPay ELSE p.factPay END) as summa,').
+            ' u.fio as fio,'.  (($approved) ?
+            ' SUBSTRING(p.payDate, 3, 5) as Month' :    
+            ' CASE WHEN (SUBSTRING(p.statementDate,1,7) = SUBSTRING(:today,1,7) OR SUBSTRING(p.statementDate,1,7) = SUBSTRING(:next,1,7)) THEN SUBSTRING(p.statementDate, 3, 5) ELSE SUBSTRING(p.payDate, 3, 5) END as Month').
+            ' FROM AppBundle:OrderPay p'.
+            ' JOIN p.order o'.
+            ' JOIN o.UserIsp u'.
+            ' JOIN o.stage s'.
+            ' JOIN s.project j'.
+//            ' WHERE (j.CustomerId='.$legId.' OR j.ContractorId='.$legId.') AND (p.payDate >= :d1 AND p.payDate <= :d2)'.
+            ' WHERE j.ContractorId='.$legId.' AND ((p.payDate >= :d1 AND p.payDate <= :d2)'.        
+            (($approved) ? '' : 'OR (p.statementDate >= :d1 AND p.statementDate <= :d2)').
+            ') AND (o.isLegalEntity IS NULL OR o.isLegalEntity = 0)'.
+            ' GROUP BY Month, fio ORDER BY Month, fio'
+            )->setParameter('d1', $d1)->setParameter('d2', $d2);
+        if (!$approved) {
+            $qb->setParameter('today', new \DateTime());
+            $qb->setParameter('next', $d2);
+        }    
+        $results = $qb->getResult();
+        
+//        $PersTable = $this->personalFromPeriodWithPays($legId, $d1, $d2->modify('last day of previous month')->setTime(23,59,59), $approved);
+        $PersTable = $this->personalFromPeriodWithPays($legId, $d1, $d2, $approved);
+        
+        foreach ($results as $result) {
+            $fio = $result['fio'];
+            $summa = $result['summa'];
+            $mn = substr($result['Month'],3,2).'.'.substr($result['Month'],0,2);
+            foreach ($PersTable as &$pers) {
+                if ($pers['fio'] === $fio) {
+                    $pers[$mn] = $summa;
+                    break;
+                }
+            }
+        }
+
+          return $PersTable;
+    }
+    
+    public function IspOrdersWithStatements($legId, $gipId)
+    {
+        $dt = new \DateTime();
+        
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT j.name as project, j.id as jid, u1.fio as gip, s.name as stage, s.id as sid, o.name as ordr, o.id as oid, u.fio as fio, p.planPay as planPay, p.id as pid, p.statementDate as stDate FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' JOIN o.UserIsp u'.
+                    ' JOIN o.stage s'.
+                    ' JOIN s.project j'.
+                    ' JOIN j.gip u1'.
+//                    ' WHERE (j.CustomerId='.$legId.' OR j.ContractorId='.$legId.') AND CONCAT(SUBSTRING(p.statementDate,6,2),\'.\',SUBSTRING(p.statementDate,3,2)) = :dt'.
+                    ' WHERE j.ContractorId='.$legId.' AND CONCAT(SUBSTRING(p.statementDate,6,2),\'.\',SUBSTRING(p.statementDate,3,2)) = :dt'.
+                    ' AND (o.isLegalEntity IS NULL OR o.isLegalEntity = 0)'.
+                    ($gipId > 0 ? ' AND u1.id = '.$gipId : '').
+                    ' ORDER BY jid, oid '
+            ) ->setParameter('dt', $dt->format('m.y'))
+            ->getResult();
+        
+        // Формирование массива с месяцами
+        $mns = array();
+        $d2 = new \DateTime();
+        $mns[] = $d2->format('m.y');
+        for ($i = 1; $i <= 12; $i++) {
+            $d2->modify('first day of previous month');
+            $mns[] = $d2->format('m.y');
+        }
+        $mns = array_reverse($mns);
+        $repO = $this->getEntityManager()->getRepository('AppBundle:StageOrder');
+        foreach ($results as &$result) {
+            foreach ($mns as $mn) {
+                $result[$mn] = 0;
+                $order = $repO->find($result['oid']);
+                $pays = $order->getPays();
+                foreach ($pays as $pay) {
+                    if ($pay->getPayDate() and $pay->getPayDate()->format('m.y')===$mn) {
+                        $result[$mn] = $pay->getFactPay();
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $results;
+    }
+    
+    public function IspOrdersWithChargs($legId)
+    {
+        $dt = new \DateTime();
+        
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT j.name as project, j.id as jid, s.name as stage, s.id as sid, o.name as ordr, o.id as oid, u.fio as fio, p.factPay as factPay, p.id as pid, p.statementDate as stDate, p.chargDate as chDate FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' JOIN o.UserIsp u'.
+                    ' JOIN o.stage s'.
+                    ' JOIN s.project j'.
+//                    ' WHERE (j.CustomerId='.$legId.' OR j.ContractorId='.$legId.') AND CONCAT(SUBSTRING(p.statementDate,6,2),\'.\',SUBSTRING(p.statementDate,3,2)) = :dt'.
+                    ' WHERE j.ContractorId='.$legId.' AND CONCAT(SUBSTRING(p.chargDate,6,2),\'.\',SUBSTRING(p.chargDate,3,2)) = :dt'.
+                    ' AND (o.isLegalEntity IS NULL OR o.isLegalEntity = 0)'.
+                    ' ORDER BY jid, oid '
+            ) ->setParameter('dt', $dt->format('m.y'))
+            ->getResult();
+        
+        // Формирование массива с месяцами
+//        $mns = array();
+//        $d2 = new \DateTime();
+//        $mns[] = $d2->format('m.y');
+//        for ($i = 1; $i <= 12; $i++) {
+//            $d2->modify('first day of previous month');
+//            $mns[] = $d2->format('m.y');
+//        }
+//        $mns = array_reverse($mns);
+//        $repO = $this->getEntityManager()->getRepository('AppBundle:StageOrder');
+//        foreach ($results as &$result) {
+//            foreach ($mns as $mn) {
+//                $result[$mn] = 0;
+//                $order = $repO->find($result['oid']);
+//                $pays = $order->getPays();
+//                foreach ($pays as $pay) {
+//                    if ($pay->getPayDate() and $pay->getPayDate()->format('m.y')===$mn) {
+//                        $result[$mn] = $pay->getFactPay();
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+
+        return $results;
+    }
 }

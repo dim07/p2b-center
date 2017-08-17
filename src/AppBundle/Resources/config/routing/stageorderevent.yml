@@ -7,8 +7,11 @@ stageorderevent_show:
     defaults: { _controller: "AppBundle:StageOrderEvent:show" }
 
 stageorderevent_new:
-    path:  /new
-    defaults: { _controller: "AppBundle:StageOrderEvent:new" }
+    path:  /{order_id}/new
+    defaults: { _controller: AppBundle:StageOrderEvent:new, order_id: order_id }
+    requirements:
+        _method:  POST
+        order_id: \d+
 
 stageorderevent_create:
     path:  /create
@@ -40,3 +43,7 @@ stageorderevent_bulk_action:
     defaults: { _controller: "AppBundle:StageOrderEvent:bulk" }
     requirements: { _method: post }
     
+stageorderevent_ajax_projects:
+    path: /ajax_proj
+    defaults: { _controller: "AppBundle:StageOrderEvent:getProjectsAjax" }
+    requirements: { _method: post }

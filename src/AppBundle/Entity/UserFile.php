@@ -3,12 +3,14 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * UserFile
  *
  * @ORM\Table(name="user_file")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserFileRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class UserFile
 {
@@ -44,16 +46,14 @@ class UserFile
     /**
      * @var string
      *
-     * @ORM\Column(name="Name", type="string", length=255, unique=true)
+     * @ORM\Column(name="Name", type="string", length=255, nullable=true)
      */
     private $name;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="UserFileName", type="string", length=255)
-     */
-    private $userFileName;
+    * @ORM\Column(name="file",type="string", length=255, nullable=true)
+    */
+    private $File;
 
     /**
      * @var bool
@@ -246,5 +246,79 @@ class UserFile
     public function getFolio()
     {
         return $this->folio;
+    }
+
+    /**
+     * Set file
+     *
+     * @param string $file
+     *
+     * @return UserFile
+     */
+    public function setFile($file)
+    {
+        $this->File = $file;
+
+        return $this;
+    }
+
+    /**
+     * Get file
+     *
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->File;
+    }
+    
+    /**
+    * @ORM\PreRemove
+    */
+    public function deleteFile()
+    {
+        if (!is_null($this->File)) {
+            $fs = new Filesystem(); 
+//            $dir = $this->get('kernel')->getRootDir().'/../web/uplo‌​ads/images/';
+//            if (!$this->isImage) {
+//                $dir = $this->get('kernel')->getRootDir().'/../web/uplo‌​ads/docs/';
+//            } 
+            $fp = $this->getAbsolutePath();
+            if ($fs->exists($fp)) {
+                $fs->remove($fp); 
+            } 
+       }
+    }
+    
+    public function getAbsolutePath()
+    {
+        return null === $this->File
+            ? null
+            : $this->getUploadRootDir().'/'.$this->File;
+    }
+
+    public function getWebPath()
+    {
+        return null === $this->File
+            ? null
+            : $this->getUploadDir().'/'.$this->File;
+    }
+
+    protected function getUploadRootDir()
+    {
+        // the absolute directory path where uploaded
+        // documents should be saved
+        return __DIR__.'/../../../../web/'.$this->getUploadDir();
+    }
+
+    protected function getUploadDir()
+    {
+        // get rid of the __DIR__ so it doesn't screw up
+        // when displaying uploaded doc/image in the view.
+        $dir = 'uplo‌​ads/images';
+        if (!$this->isImage) {
+            $dir = 'uplo‌​ads/docs';
+        }
+        return $dir;
     }
 }

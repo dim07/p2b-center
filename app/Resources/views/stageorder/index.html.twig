@@ -21,11 +21,10 @@
 
         <form class="well" action="{{ path('stageorder') }}" method="get" >
             <div class="row">
-                <div class="col-md-6">{{ form_row(filterForm.section) }}</div> 
+               {# <div class="col-md-6">{{ form_row(filterForm.section) }}</div> 
                 <div class="col-md-6">{{ form_row(filterForm.isLegalEntity) }}</div>
                 <div class="col-md-6">{{ form_row(filterForm.startDate) }}</div>
                 <div class="col-md-6">{{ form_row(filterForm.isPublic) }}</div>
-              {#  <div class="col-md-6">{{ form_row(filterForm.Contractor) }}</div>
                 <div class="col-md-6">{{ form_row(filterForm.UserIsp) }}</div> #}
 
                 <div class="col-md-6">
@@ -89,20 +88,7 @@
     </div>
 
 </div> <!-- /#top -->
-
-{#
-<div class="row">
-    <div class="col-md-12">
-        {% for type, flashMessages in app.session.flashbag.all() %} 
-        {% for flashMessage in flashMessages %}
-        <div class="alert alert-{{ type }}">
-            {{ flashMessage|raw }}
-        </div>
-         {% endfor %} 
-         {% endfor %} 
-    </div>
-</div>
-#}    
+   
 
 <div class="row">
 

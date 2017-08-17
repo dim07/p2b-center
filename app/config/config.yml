@@ -12,7 +12,10 @@ parameters:
 
 framework:
     #esi:             ~
-    translator:      { fallbacks: ["%locale%"] }
+    translator:      #{ fallbacks: ["%locale%"] }
+        enabled:    true
+        fallback:   "%locale%"
+        logging:    false
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -46,6 +49,7 @@ twig:
     - 'VichUploaderBundle:Form:fields.html.twig'
     - 'form/fields.html.twig'
     - LexikFormFilterBundle:Form:form_div_layout.html.twig
+#    - 'JbFileUploaderBundle:Form:fields.html.twig'
 
 # Doctrine Configuration
 doctrine:
@@ -93,6 +97,13 @@ fos_user:
     profile:
         form:
             type: AppBundle\Form\ProfileFormType        
+
+lexik_form_filter:
+    listeners:
+        doctrine_orm: true
+        doctrine_dbal: false
+        doctrine_mongodb: false
+    condition_pattern: text.contains        
         
 easy_admin:
     formats:
@@ -191,6 +202,100 @@ easy_admin:
                     - '-id'
         EventType:
             class: AppBundle\Entity\EventType
+            new:
+                fields:
+                    - '-id'  
+        LegalEntity:
+            class: AppBundle\Entity\LegalEntity
+            list:
+#                sort: 'name'
+                fields:
+                    - id
+                    - name
+                    - hideName
+                    - user
+                    - idUser
+                    - legalAdr
+                    - customer
+                    - contractor
+            form:
+                fields:
+#                    - id
+                    - name
+                    - hideName
+                    - { property: 'user', help: 'Нельзя выбирать пользователя, у которого уже есть Юрлицо, будет ошибка...', type_options: { required: true } }
+                    - legalAdr
+                    - customer
+                    - contractor
+#            new:
+#                fields:
+#                    - '-id'  
+        Sector: 
+            class: AppBundle\Entity\Sector  
+            list:
+                fields:
+                    - id
+                    - name
+                    - objects
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'objects', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'  
+                    - '-objects'
+        Object: 
+            class: AppBundle\Entity\SectorObject
+            list:
+                sort: 'sector'
+                fields:
+                    - id
+                    - name
+                    - sector
+                    - subobjects
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'sector', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'
+        Subobject: 
+            class: AppBundle\Entity\SubObject
+            list:
+                sort: 'object'
+                fields:
+                    - id
+                    - name
+                    - object
+                    - items
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'object', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'
+        SubObjectItem: 
+            class: AppBundle\Entity\SubObjectItem
+            list:
+                sort: 'subobject'
+                fields:
+                    - id
+                    - name
+                    - subobject
+            form:
+                fields:
+                    - id
+                    - name
+                    - { property: 'subobject', type_options: { required: false } }
+            new:
+                fields:
+                    - '-id'            
         
 vich_uploader:
     db_driver: orm       
@@ -203,26 +308,122 @@ vich_uploader:
             delete_on_remove:   true
             
 liip_imagine :
+    loaders:
+        stream.image_filesystem:
+            stream:
+                wrapper: gaufrette://image/
+    filter_sets:
+        original: ~
+        cache : ~
+        thumb_from_original:
+            data_loader: stream.image_filesystem
+            quality: 75
+            filters:
+                # create a thumbnail: set size to 120x90 and use the "outbound" mode
+                # to crop the image when the size ratio of the input differs
+                thumbnail  : { size : [120, 160], mode : outbound }
+                # create a 2px black border: center the thumbnail on a black background
+                # 4px larger to create a 2px border around the final image
+                #background : { size : [124, 94], position : center, color : '#000000' }
+        # name our filter set "my_watermark_filter"
+        my_watermark_filter:
+            data_loader: stream.image_filesystem
+            quality: 75
+            filters:
+
+                # use and setup the "watermark" filter
+                watermark:
+
+                    # path to the watermark file (prepended with "%kernel.root_dir%")
+                    image: Resources/data/watermark.png
+
+                    # size of the water mark relative to the input image
+                    size: 0.75
+
+                    # set the position of the watermark
+                    position: center
+#                watermark:
+#                    image: Resources/data/watermark.png
+#                    size: 0.25
+#                    position: topleft   
+#                watermark:
+#                    image: Resources/data/watermark.png
+#                    size: 0.25
+#                    position: topright     
+#                watermark:
+#                    image: Resources/data/watermark.png
+#                    size: 0.25
+#                    position: bottomleft   
+#                watermark:
+#                    image: Resources/data/watermark.png
+#                    size: 0.25
+#                    position: bottomright        
     resolvers :
         default :
             web_path : ~
 
-    filter_sets :
-        cache : ~
 
-        # the name of the "filter set"
-        my_thumb :
+knp_gaufrette:
+    stream_wrapper: ~
+    adapters:
+        image:
+            local:
+                directory: "%kernel.root_dir%/../web/uploads/images"
+                create: true
+        doc:
+            local:
+                directory: "%kernel.root_dir%/../web/uploads/docs"
+                create: true        
+    filesystems:
+        image:
+            adapter: image
+            alias: image_filesystem
+        doc:    
+            adapter: doc
+            alias: doc_filesystem
 
-            # adjust the image quality to 75%
-            quality : 75
-
-            # list of transformations to apply (the "filters")
-            filters :
-
-                # create a thumbnail: set size to 120x90 and use the "outbound" mode
-                # to crop the image when the size ratio of the input differs
-                thumbnail  : { size : [120, 90], mode : outbound }
-
-                # create a 2px black border: center the thumbnail on a black background
-                # 4px larger to create a 2px border around the final image
-                background : { size : [124, 94], position : center, color : '#000000' }
+oneup_uploader:
+    mappings:
+        gallery:
+            frontend: blueimp
+            storage:
+                type: gaufrette
+                filesystem: gaufrette.image_filesystem
+                stream_wrapper: gaufrette://image/   
+            allowed_mimetypes: [image/png, image/jpg, image/jpeg, image/gif]
+            max_size: 1M    
+        doc_store:
+            frontend: blueimp
+            storage:
+                type: gaufrette
+                filesystem: gaufrette.doc_filesystem
+                stream_wrapper: gaufrette://doc/  
+            allowed_mimetypes: [application/pdf, application/zip, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]
+            max_size: 20M     
+                
+jb_file_uploader:
+    resolvers:
+        upload_image:
+            assets:
+                directory: uploads/images
+        upload_doc:
+            assets:
+                directory: uploads/docs        
+    endpoints:
+        gallery:
+            upload_resolver: upload_image
+            upload_validators:
+                Image:
+                    MinWidth: 100
+                    MaxWidth: 1600
+                    MinHeight: 100
+                    MaxHeight: 1600
+            crop_validators: {} 
+        doc_store:
+            upload_resolver: upload_doc
+            upload_validators: {}
+            crop_validators: {}
+            
+#mewes_k_twig_excel:
+#    pre_calculate_formulas: false
+#    disk_caching_directory: "%kernel.cache_dir%/phpexcel"

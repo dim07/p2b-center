@@ -18,6 +18,27 @@ use AppBundle\Entity\StageOrder;
  */
 class ProjectStageController extends Controller
 {
+    public function userHasRole($id ,$role) {
+           // Entity manager
+           $em= $this->getDoctrine()->getManager();
+           $qb = $em->createQueryBuilder();
+
+           $qb->select('u')
+                   ->from('AppBundle:User', 'u') // Change this to the name of your bundle and the name of your mapped user Entity
+                   ->where('u.id = :user') 
+                   ->andWhere('u.roles LIKE :roles')
+                   ->setParameter('user', $id)
+                   ->setParameter('roles', '%"' . $role . '"%');
+
+           $user = $qb->getQuery()->getResult();
+
+           if(count($user) >= 1){
+              return true;
+           }else{
+              return false;
+           }
+    }
+    
     /**
      * Lists all ProjectStage entities.
      *
@@ -126,7 +147,36 @@ class ProjectStageController extends Controller
         return array($entities, $pagerHtml);
     }
     
-    
+    private function UpdateGipPlanCost(\AppBundle\Entity\project $project) {
+        // Найти ГИП и посчитать ему план стоимость
+        $orderGip = NULL;
+        $sumCostofStages = 0;
+        $sumCostofLeg = 0;
+        $sumCostofIsp = 0;
+        
+        foreach ($project->getStages() as $stage) {
+            $sumCostofStages += $stage->getCost();
+            foreach ($stage->getOrders() as $order) {
+                if ($order->getIsLegalEntity()) {
+                    $sumCostofLeg += $order->getCost();
+                } else {
+//                    if ($order->getIdSection() == 131 and $order->getUserId() === $project->getGipId()) {
+                    if ($order->getIdSection() == 131) {
+                        $orderGip = $order;
+                    } else {
+                        $sumCostofIsp += $order->getCost();
+                    } 
+                }    
+            }
+        }
+        
+        if ($orderGip) { 
+            $orderGip->setCost(round(($sumCostofStages-$sumCostofLeg)/1.18*$project->getNofot()- $sumCostofIsp,2));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($orderGip);
+            $em->flush();
+        }
+    }
 
     /**
      * Displays a form to create a new ProjectStage entity.
@@ -156,6 +206,8 @@ class ProjectStageController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($projectStage);
             $em->flush();
+            
+            $this->UpdateGipPlanCost($proj);
             
             $editLink = $this->generateUrl('projectstage_edit', array('id' => $projectStage->getId()));
             $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>Новый этап проекта успешно создан.</a>" );
@@ -192,17 +244,29 @@ class ProjectStageController extends Controller
      */
     public function editAction(Request $request, ProjectStage $projectStage)
     {
+        $user = $this->getUser();
+        $userId = $user->getId();
+        $project = $projectStage->getProject();
+        if (!($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN') or 
+//                $userId===$project->getGipId() or 
+                $userId===$project->getContractorId() or 
+                $userId===$project->getCustomerId())) {
+            throw $this->createAccessDeniedException();
+        }
+        
         $deleteForm = $this->createDeleteForm($projectStage);
         $editForm = $this->createForm('AppBundle\Form\ProjectStageType', $projectStage);
         $new_order = new StageOrder();
         $new_order->setStage($projectStage);
-        $newOrderForm = $this->createForm('AppBundle\Form\StageOrderType', $new_order);
+        $newOrderForm = $this->createForm('AppBundle\Form\StageOrderType', $new_order, array('user' => $user));
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($projectStage);
             $em->flush();
+            
+            $this->UpdateGipPlanCost($project);
             
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('projectstage_edit', array('id' => $projectStage->getId()));
@@ -228,9 +292,13 @@ class ProjectStageController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $proj = $projectStage->getProject();
             $em = $this->getDoctrine()->getManager();
             $em->remove($projectStage);
             $em->flush();
+            
+            $this->UpdateGipPlanCost($proj);
+            
             $this->get('session')->getFlashBag()->add('success', 'The ProjectStage was deleted successfully');
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the ProjectStage');

@@ -42,7 +42,7 @@ class User extends BaseUser
     protected $sections;
     
     /**
-     * @ORM\OneToMany(targetEntity="project", mappedBy="gip", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="project", mappedBy="gip")
      */
     private $gipprojects;
     
@@ -500,6 +500,17 @@ class User extends BaseUser
     public function getOrderscount()
     {
         return count($this->orders);
+    }
+    
+    public function getOrderscountcur()
+    {
+        $cnt = 0;
+        foreach ($this->orders as $order) {
+            if ($order->getFactEndDate() == NULL) {
+                $cnt = $cnt+1;
+            }
+        }
+        return $cnt;
     }
     
     public function __toString() 

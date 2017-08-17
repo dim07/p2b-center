@@ -1,0 +1,45 @@
+offer:
+    path:  /
+    defaults: { _controller: "AppBundle:Offer:index" }
+
+offer_show:
+    path:  /{id}/show
+    defaults: { _controller: "AppBundle:Offer:show" }
+
+offer_new:
+    path:  /{order_id}/new
+    defaults: { _controller: AppBundle:Offer:new, order_id: order_id }
+    requirements:
+        _method:  POST
+        order_id: \d+
+
+offer_create:
+    path:  /create
+    defaults: { _controller: "AppBundle:Offer:create" }
+    requirements: { _method: post }
+
+offer_edit:
+    path:  /{id}/edit
+    defaults: { _controller: "AppBundle:Offer:edit" }
+
+offer_update:
+    path:  /{id}/update
+    defaults: { _controller: "AppBundle:Offer:update" }
+    requirements: { _method: post|put }
+
+offer_delete:
+    path:  /{id}/delete
+    defaults: { _controller: "AppBundle:Offer:delete" }
+    requirements: { _method: post|delete }
+    
+offer_by_id_delete:
+    path:  /delete/{id}
+    defaults: { _controller: "AppBundle:Offer:deleteById" }
+    requirements: { _method: get }
+    
+
+offer_bulk_action:
+    path:  /bulk-action
+    defaults: { _controller: "AppBundle:Offer:bulk" }
+    requirements: { _method: post }
+    

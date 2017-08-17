@@ -15,8 +15,8 @@ class UserFilterType extends AbstractType
     {
         $builder
             ->add('id', Filters\NumberFilterType::class)
-            ->add('fio', Filters\TextFilterType::class)
-            ->add('phone', Filters\TextFilterType::class)
+//            ->add('fio', Filters\TextFilterType::class)
+//            ->add('phone', Filters\TextFilterType::class)
             ->add('rating', Filters\NumberFilterType::class)
             ->add('region', Filters\TextFilterType::class)
         

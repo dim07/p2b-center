@@ -6,6 +6,10 @@
     {#<link href="{{ asset('css/fileinput.min.css') }}" media="all" rel="stylesheet" type="text/css" />#}
     <link rel="stylesheet" href="{{ asset('css/bootstrap-datetimepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/highlight-solarized-light.css') }}">
+    
+    <link href="{{ asset('bundles/jbfileuploader/lib/jquery-file-upload/css/jquery.fileupload.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('bundles/jbfileuploader/css/jbfileupload.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('bundles/jbfileuploader/lib/jcrop/css/jquery.Jcrop.min.css') }}" type="text/css" rel="stylesheet" />
     {#{{ form_stylesheet(form) }}#}
 {% endblock %}
 
@@ -63,6 +67,19 @@
     <script src="{{ asset('js/highlight.pack.js') }}"></script>
     <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('bundles/petkoparacrudgenerator/js/petkopara-crud-generator.js') }}"></script>
+    
+    <script type="text/javascript" src="{{ asset('bundles/jbfileuploader/lib/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/jbfileuploader/lib/jquery-file-upload/js/jquery.iframe-transport.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/jbfileuploader/lib/jquery-file-upload/js/jquery.fileupload.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/jbfileuploader/js/jbfileupload.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/jbfileuploader/lib/jcrop/js/jquery.Jcrop.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function()
+        {
+            $('.jb_fileupload').jbFileUpload();
+            
+        });
+    </script>
 
     
     <!-- optionally if you need a theme like font awesome theme you can include 

@@ -10,4 +10,78 @@ namespace AppBundle\Repository;
  */
 class StageOrderEventRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function eventsFromPeriod($LegId, $GipId, $projectId, $etId, $dt1, $dt2)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('e')
+            ->from('AppBundle:StageOrderEvent', 'e')
+            ->leftJoin('e.order','o')
+            ->leftJoin('o.stage','s') 
+            ->leftJoin('s.project','j')
+            ->leftJoin('j.gip','u') 
+            ->leftJoin('e.EventType','t')    
+            ->addSelect(array('j.name as project', 'j.id as project_id', 's.name as stage',
+                    's.id as stage_id', 'o.name as ordr', 'o.id as order_id',
+                    'u.fio as gip', 'u.id as gip_id'))    
+            ->orderBy('e.eventDate','DESC');
+        if (is_null($dt2)) { 
+            $dt2 = (new \DateTime())->format('Y-m-d');
+//            $dt2->setTime(23,59,59);
+            if (is_null($dt1)) {
+                $dt1 = (new \DateTime('-1 month'))->format('Y-m-d');
+//                $dt1->setTime(0,0,0);
+            }
+        } elseif (is_null($dt1)) {
+           $dt1 = clone $dt2;
+           $dt1->modify('-1 month')->format('Y-m-d');
+//           $dt2->setTime(0,0,0);
+        } 
+        $qb->where($qb->expr()->between('e.eventDate', ':dt1', ':dt2'));
+            
+        if (!($LegId===NULL) && $LegId>0) {
+            $qb->andWhere('j.ContractorId = '.$LegId);
+        }
+        if (!($GipId===NULL) && $GipId>0) {
+            $qb->andWhere('j.GipId = '.$GipId);
+        }
+        if (!($projectId===NULL) && $projectId>0) {
+            $qb->andWhere('j.id = '.$projectId);
+        }
+        if (!($etId===NULL) && $etId>0) {
+            $qb->andWhere('t.id = '.$etId);
+        }
+        $results = $qb->setParameters(array('dt1'=>$dt1, 'dt2'=>$dt2))->getQuery()
+            ->getResult();
+        return $results;
+    }
+    
+    public function eventsFromProject($projectId, $etId, $dt1, $dt2)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('e')
+            ->from('AppBundle:StageOrderEvent', 'e')
+            ->leftJoin('e.order','o')
+            ->leftJoin('o.stage','s') 
+            ->leftJoin('s.project','j')
+            ->leftJoin('j.gip','u') 
+            ->leftJoin('e.EventType','t')
+            ->addSelect(array(
+                    's.name as stage', 's.id as stage_id', 
+                    'o.name as ordr', 'o.id as order_id',
+                    'u.fio as gip', 'u.id as gip_id'))    
+            ->orderBy('e.eventDate','DESC')
+            ->andWhere('j.id = '.$projectId);
+        if (!($etId===NULL) && $etId>0) {
+            $qb->andWhere('t.id = '.$etId);
+        }
+        if (!is_null($dt1)) {
+           $qb->andWhere('e.eventDate >= :dt1')->setParameter('dt1',$dt1); 
+        }
+        if (!is_null($dt2)) {
+           $qb->andWhere('e.eventDate <= :dt2')->setParameter('dt2',$dt2); 
+        }
+
+        $results = $qb->getQuery()->getResult();
+        return $results;
+    }
 }

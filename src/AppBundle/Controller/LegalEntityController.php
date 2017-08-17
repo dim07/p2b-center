@@ -10,6 +10,9 @@ use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
 use AppBundle\Entity\LegalEntity;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use AppBundle\Form\Type\DateTimePickerType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 /**
  * LegalEntity controller.
@@ -306,6 +309,237 @@ class LegalEntityController extends Controller
         }
 
         return $this->redirect($this->generateUrl('legalentity'));
+    }
+    
+    
+    public function reportPaysAction(Request $request, LegalEntity $legalEntity)
+    {
+        $approved = $request->get('approved');
+        $em = $this->getDoctrine()->getManager();
+        
+        $admin = $this->get('security.authorization_checker')->isGranted('ROLE_ADMIN');
+        $data = array();
+        $filterForm = $this->createForm('AppBundle\Form\reportLegPaysFilterType', 
+            $data,
+            array('approved' => $approved) 
+            );
+        if ($request->get('filter_action') == 'filter') {
+            $filterForm->handleRequest($request);
+
+            if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+
+                $data = $filterForm->getData();
+                // Для entity getData возвращает имена вместо Id, поэтому:
+                if (array_key_exists('leg',$data)) {
+                    $data['leg']=$request->get('leg');
+                }    
+            }
+        }
+        $legrep = $em->getRepository('AppBundle:LegalEntity');
+        $leg = $admin ? (array_key_exists('leg',$data) && $data['leg']!=='' ? ($data['leg'] instanceof \AppBundle\Entity\LegalEntity ? $data['leg']->getId() : intval($data['leg'])) : $legalEntity->getId()) : $legalEntity->getId();
+        $pays = $legrep->paysIspLastYearGroupedByMonthWithCurPlan(
+            $leg,
+            $approved);
+        $legName = $legrep->find($leg)->getName();
+        // Формирование массива с месяцами
+        
+        $mns = $approved ? $this->get('monthes')->get13() : $this->get('monthes')->get14();
+        $sums = array();
+        foreach ($mns as $mn) {
+            $sums[$mn] = 0;
+            foreach ($pays as $pay) {
+                $sums[$mn]+= array_key_exists($mn, $pay) ? $pay[$mn] : 0;
+            }
+        }
+        $mn0 = (new \DateTime())->format('m.y');
+        $sums['sred'] = 0;
+        foreach ($pays as $pay) {
+            $sums['sred']+= ($pay['summa']-$pay[$mn0])/12;
+        }
+        
+        return $this->render('legalentity/report_pays.html.twig', array(
+            'legalEntity' => $legalEntity,
+            'mns' => $mns,
+            'pays' => $pays,
+            'sums' => $sums,
+            'approved' => $approved,
+            'filterForm' => $filterForm->createView(),
+            'legName' => $legName,
+//            'dmp' => $dmp,
+        ));
+    }
+    
+    public function confirmPaysAction(Request $request, LegalEntity $legalEntity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $repPay = $em->getRepository('AppBundle:OrderPay');
+        
+        $user = $this->getUser();
+        $filterData = array();
+        $userRep = $em->getRepository('AppBundle:User');
+        $gid = $request->get('gip');
+        $gip = FALSE;
+        if ($gid) {
+            $gip = $userRep->find($gid);
+        }    
+        if ($gip) {
+            $filterData['gip'] = $gip;
+        }
+        $filterForm = $this->createForm('AppBundle\Form\confirmPaysFilterType', 
+            $filterData, 
+            array('user' => $user)
+            );
+        
+        if ($request->get('filter_action') == 'filter') {
+            $filterForm->handleRequest($request);
+
+            if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+
+                $filterData = $filterForm->getData();
+                // Для entity getData возвращает имена вместо Id, поэтому:
+                if (array_key_exists('gip', $filterData)) {
+                    $filterData['gip']=$request->get('gip');
+                }
+            }
+        }
+        $gipId = array_key_exists('gip',$filterData) && $filterData['gip']!=='' ? ($filterData['gip'] instanceof \AppBundle\Entity\User ? $filterData['gip']->getId() : intval($filterData['gip'])) : 0;
+        $pays = $em->getRepository('AppBundle:LegalEntity')->IspOrdersWithStatements($legalEntity->getId(), $gipId);
+        // Формирование массива с месяцами
+        $mns = $this->get('monthes')->get12();
+        $mn0 = (new \DateTime())->format('m.y');
+        // Массив для заполнения формы
+        $data0 = array();
+        foreach ($pays as $pay) {
+            $fp = $repPay->find($pay['pid'])->getFactPay();
+            if ($fp) {
+                $data0['factPay'.$pay['pid']] = $fp;
+            } else {
+                $data0['factPay'.$pay['pid']] = $pay['planPay'];
+            }
+        }
+        ////Делаем форму
+        $fb = $this->createFormBuilder($data0);
+        foreach ($pays as $pay) {
+            $fb->add('factPay'.$pay['pid'], MoneyType::class, array(
+                                'label' => '', 
+                                'currency' => 'RUB',
+                                'required' => false
+                            ));
+        }
+        $form = $fb->getForm();
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $upd_st_cnt = 0;
+            foreach ($data as $key => $value) {
+                $id = (int)substr($key,7);
+                $pay0 = $repPay->find($id);
+                
+                if ( $value !== $pay0->getFactPay()) {
+                    $pay0->setFactPay($value);
+                    $pay0->setChargDate(new \DateTime());
+                    $em->persist($pay0);
+                    //$em->flush();
+                    $upd_st_cnt++;
+                }    
+            }
+            if ($upd_st_cnt > 0) {
+                $em->flush();
+                $this->get('session')->getFlashBag()->add('success', 'Выполнено '.$upd_st_cnt.' утверждений на выплату');
+            } else {
+                $this->get('session')->getFlashBag()->add('info', 'Изменений в утверждениях на выплату не произведено.');
+            }
+            
+        }
+        
+        return $this->render('legalentity/confirm_pays.html.twig', array(
+            'legalEntity' => $legalEntity,
+            'mns' => $mns,
+            'pays' => $pays,
+            'filterForm' => $filterForm->createView(),
+            'form' => $form->createView(),
+        ));
+    }
+    
+    public function confirmFactPaysAction(Request $request, LegalEntity $legalEntity)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $repPay = $em->getRepository('AppBundle:OrderPay');
+        $pays = $em->getRepository('AppBundle:LegalEntity')->IspOrdersWithChargs($legalEntity->getId());
+
+        $mn0 = (new \DateTime())->format('m.y');
+        // Массив для заполнения формы
+        $data0 = array();
+        foreach ($pays as $pay) {
+            $pd = $repPay->find($pay['pid'])->getPayDate();
+            if ($pd) {
+                $data0['payDate'.$pay['pid']] = $pd;
+            } else {
+                $data0['payDate'.$pay['pid']] = new \DateTime();//$pay['chDate'];
+            }
+            $data0['confirm'.$pay['pid']] = TRUE;
+        }
+        ////Делаем форму
+        $fb = $this->createFormBuilder($data0);
+        foreach ($pays as $pay) {
+            $fb->add('payDate'.$pay['pid'], DateTimePickerType::class, [
+                'label' => 'Дата выплаты',
+                'format' => 'dd.MM.yyyy',
+                'required' => false
+            ]);
+            $fb->add('confirm'.$pay['pid'], CheckboxType::class, array(
+                    'label' => false,
+                    'required' => false,
+            ));
+        }
+        $form = $fb->getForm();
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $upd_st_cnt = 0;
+            $not_confirm_cnt=0;
+            foreach ($data as $key => $value) {
+                if (substr($key,0,7)==='payDate') {
+                    $id = (int)substr($key,7);
+                    $pay0 = $repPay->find($id);
+                    if ($data['confirm'.$id]) {
+                        if ( $value !== $pay0->getPayDate()) {
+                            $pay0->setPayDate($value);
+                            $em->persist($pay0);
+                            //$em->flush();
+                            $upd_st_cnt++;
+                        } 
+                    } else {
+                        $pay0->setPayDate(NULL);
+                        $em->persist($pay0);
+                        //$em->flush();
+                        $not_confirm_cnt++;
+                    }    
+                }    
+            }
+            if ($upd_st_cnt > 0 or $not_confirm_cnt > 0) {
+                $em->flush();
+                if ($upd_st_cnt > 0) {
+                    $this->get('session')->getFlashBag()->add('success', 'Выполнено '.$upd_st_cnt.' подтверждений дат выплат');
+                }
+                if ($not_confirm_cnt > 0) {
+                    $this->get('session')->getFlashBag()->add('warning', 'Не подтверждено '.$not_confirm_cnt.' дат выплат');
+                }
+            } else {
+                $this->get('session')->getFlashBag()->add('info', 'Изменений в датах выплат не произведено.');
+            }
+            
+        }
+        
+        return $this->render('legalentity/confirm_fact_pays.html.twig', array(
+            'legalEntity' => $legalEntity,
+            'pays' => $pays,
+            'form' => $form->createView(),
+        ));
     }
     
 

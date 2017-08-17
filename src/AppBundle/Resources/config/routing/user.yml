@@ -40,3 +40,7 @@ user_bulk_action:
     defaults: { _controller: "AppBundle:User:bulk" }
     requirements: { _method: post }
     
+user_ajax_gips:
+    path: /ajax_gips
+    defaults: { _controller: "AppBundle:User:getGipsAjax" }
+    requirements: { _method: post } 

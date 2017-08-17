@@ -2,6 +2,10 @@ portfolio:
     path:  /
     defaults: { _controller: "AppBundle:portfolio:index" }
 
+portfolio_user:
+    path:  /user-folio
+    defaults: { _controller: "AppBundle:portfolio:userPortfolios" }
+    
 portfolio_show:
     path:  /{id}/show
     defaults: { _controller: "AppBundle:portfolio:show" }
@@ -38,5 +42,15 @@ portfolio_by_id_delete:
 portfolio_bulk_action:
     path:  /bulk-action
     defaults: { _controller: "AppBundle:portfolio:bulk" }
+    requirements: { _method: post }
+    
+portfolio_ajax_objects:
+    path: /ajax_obj
+    defaults: { _controller: "AppBundle:portfolio:getObjectsAjax" }
+    requirements: { _method: post }
+    
+portfolio_ajax_subobjects:
+    path: /ajax_sub
+    defaults: { _controller: "AppBundle:portfolio:getSubobjectsAjax" }
     requirements: { _method: post }
     

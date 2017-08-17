@@ -1,3 +1,4 @@
+{% set page_name = 'events' %}
 {% extends 'myforms.html.twig' %}
 
 {% block title %}
@@ -36,7 +37,7 @@
                     <div class="col-md-6">{{ form_row(filterForm.info) }}</div>
 
                  
-                    <div class="col-md-6">{{ form_row(filterForm.idFile) }}</div>
+                    <div class="col-md-6">{{ form_row(filterForm.File) }}</div>
 
                                 <div class="col-md-6">
                     {{ form_rest(filterForm) }}
@@ -132,7 +133,7 @@
                             <th>{{macros.th_sortable('idEventType',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'stageorderevent')}}</th>
                             <th>{{macros.th_sortable('eventDate',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'stageorderevent')}}</th>
                             <th>{{macros.th_sortable('info',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'stageorderevent')}}</th>
-                            <th>{{macros.th_sortable('idFile',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'stageorderevent')}}</th>
+                            <th>{{macros.th_sortable('File',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'stageorderevent')}}</th>
     
                        
                         <th width = "130px">List</th>
@@ -147,7 +148,7 @@
                         <td>{{ stageOrderEvent.idEventType }}</td>
                         <td>{%- if stageOrderEvent.eventDate %}{{ stageOrderEvent.eventDate|date('Y-m-d H:i:s') }}{% endif %}</td>
                         <td>{{ stageOrderEvent.info }}</td>
-                        <td>{{ stageOrderEvent.idFile }}</td>
+                        <td>{{ stageOrderEvent.File }}</td>
     
                         <td class="actions">
                             <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('stageorderevent_by_id_delete', { 'id': stageOrderEvent.id}) }}">

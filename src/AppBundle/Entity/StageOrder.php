@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+
 /**
  * StageOrder
  *
@@ -23,6 +24,13 @@ class StageOrder
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
 
     /**
      * @var int
@@ -157,6 +165,30 @@ class StageOrder
     private $pays;
     
     /**
+     * @ORM\OneToMany(targetEntity="Offer", mappedBy="order")
+     * @ORM\OrderBy({"cost" = "ASC"})
+     */
+    private $offers;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="OrderTabel", mappedBy="order")
+     * @ORM\OrderBy({"date" = "ASC"})
+     */
+    private $tabels;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="offer_id", type="integer", nullable=true)
+     */
+    private $offerId;
+    
+
+//    private $offer;
+    
+    private $factPay;
+    
+    /**
      * @ORM\OneToMany(targetEntity="StageOrderEvent", mappedBy="order")
      */
     private $events;
@@ -170,6 +202,63 @@ class StageOrder
         $this->pays = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->beforeorders = new ArrayCollection();
+        $this->offers = new ArrayCollection();
+        $this->tabels = new ArrayCollection();
+    }
+    
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return StageOrder
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+    
+    public function getOffer()
+    {
+        return $this->offer;
+    }
+    
+    public function setOffer(\AppBundle\Entity\Offer $offer)
+    {
+        $this->offer = $offer;
+        $user = $offer->getUser();
+        $leg = $offer->getLegal();
+        if (!is_null($user)) {
+           $this->setUserIsp($user); 
+        }
+        if (!is_null($leg)) {
+           $this->setContractor($leg); 
+        }
+        return $this;
+    }
+    
+    public function getFactPay()
+    {
+        return $this->factPay;
+    }
+    
+    public function setFactPay($FactPay)
+    {
+        $this->factPay = $FactPay;
+
+        return $this;
     }
     
     /**
@@ -279,7 +368,7 @@ class StageOrder
      */
     public function getCost()
     {
-        return $this->cost;
+        return ($this->cost ? $this->cost : 0);
     }
 
     /**
@@ -736,7 +825,7 @@ class StageOrder
     
     public function __toString()
     {
-        return $this->section->getName();
+        return $this->getName();
     }
 
     /**
@@ -783,6 +872,11 @@ class StageOrder
         return $this->stage->GetProject()->GetCustomer()->GetName();
     }
     
+    public function getCustomerId()
+    {
+        return $this->stage->GetProject()->GetCustomer()->GetId();
+    }
+    
     /**
      * Get Project
      *
@@ -791,6 +885,11 @@ class StageOrder
     public function getProject()
     {
         return $this->stage->GetProject()->GetName();
+    }
+    
+    public function getProjectId()
+    {
+        return $this->stage->GetProject()->GetId();
     }
     
     /**
@@ -805,5 +904,122 @@ class StageOrder
                 ->addViolation(); 
             }
         }
+    }
+
+    /**
+     * Set offerId
+     *
+     * @param integer $offerId
+     *
+     * @return StageOrder
+     */
+    public function setOfferId($offerId)
+    {
+        $this->offerId = $offerId;
+
+        return $this;
+    }
+
+    /**
+     * Get offerId
+     *
+     * @return integer
+     */
+    public function getOfferId()
+    {
+        return $this->offerId;
+    }
+
+    /**
+     * Add offer
+     *
+     * @param \AppBundle\Entity\Offer $offer
+     *
+     * @return StageOrder
+     */
+    public function addOffer(\AppBundle\Entity\Offer $offer)
+    {
+        $this->offers[] = $offer;
+
+        return $this;
+    }
+
+    /**
+     * Remove offer
+     *
+     * @param \AppBundle\Entity\Offer $offer
+     */
+    public function removeOffer(\AppBundle\Entity\Offer $offer)
+    {
+        $this->offers->removeElement($offer);
+    }
+
+    /**
+     * Get offers
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+    
+    /**
+     * Add tabel
+     *
+     * @param \AppBundle\Entity\OrderTabel $tabel
+     *
+     * @return StageOrder
+     */
+    public function addTabel(\AppBundle\Entity\OrderTabel $tabel)
+    {
+        $this->tabels[] = $tabel;
+
+        return $this;
+    }
+
+    /**
+     * Remove tabel
+     *
+     * @param \AppBundle\Entity\OrderTabel $tabel
+     */
+    public function removeTabel(\AppBundle\Entity\OrderTabel $tabel)
+    {
+        $this->pays->removeElement($tabel);
+    }
+
+    /**
+     * Get tabels
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTabels()
+    {
+        return $this->tabels;
+    }
+
+    
+    
+    private $datas;
+    public function getDatas()
+    {
+        return $this->datas;
+    }
+    
+    public function setDatas($datas)
+    {
+        $this->datas = $datas;
+        return $this;
+    }
+    
+    public function getIspPays()
+    {
+        $cost = 0;
+        if (!$this->getIsLegalEntity()) {
+            foreach ($this->pays as $pay) {
+                $cost += $pay->getFactPay();
+            }    
+        }    
+        return $cost;
     }
 }

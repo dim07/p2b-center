@@ -100,6 +100,18 @@ body {
         margin-bottom: 8px;
 }
 
+.slide-caption {
+	/*font-family: 'Raleway', sans-serif;*/
+        /*color: $lnk-clr;*/
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        /*text-shadow: 4px 4px 2px rgba(150, 150, 150, 0.7);*/
+        text-shadow: $dark-clr 1px 1px 0, $dark-clr -1px -1px 0, 
+                 $dark-clr -1px 1px 0, $dark-clr 1px -1px 0;
+        margin-bottom: 8px;
+        font-size: 24px;
+}
+
 body {
 	font-size: 12px;
 	line-height: 1.1;
@@ -184,13 +196,14 @@ h2 {
 }
 h3 {
 	font-size: 22px;
-        border-left-style: solid;
+        /*border-left-style: solid;*/
         border-left-width: 1em;
         padding-left: 1em;
 }
 h4 {
 	font-size: 18px;
 	font-weight: 900;
+        color: $dark-clr;
 }
 h5 {
 	font-size: 16px;
@@ -758,6 +771,11 @@ textarea {
         font-weight: 900;
 }
 
+.content_main {
+    font-size: 14px;
+    color: $dark-clr;
+}
+
 /* Testimonials
 ---------------------------------- */
 .testimonial .media-left {
@@ -904,7 +922,7 @@ textarea {
 	transform: scale(1);
 }
 
-.dropdown-menu {
+/*.dropdown-menu {
     width: auto;
     z-index: 10000;
     height: auto;
@@ -914,22 +932,27 @@ textarea {
   -webkit-transform: scale(1, 1);
   transform: scale(1, 1);  
   opacity:1;
-}
+}*/
   
-.dropdown-menu {
-  /*opacity:.3;*/
-/*  -webkit-transform-origin: top;
+/*.dropdown-menu {
+  opacity:.3;
+  -webkit-transform-origin: top;
   transform-origin: top;
   -webkit-animation-fill-mode: forwards;  
   animation-fill-mode: forwards; 
-  -webkit-transform: scale(1, 0);*/
+  -webkit-transform: scale(1, 0);
+
   display: block; 
   transition: all 0.2s linear;
   -webkit-transition: all 0.2s linear;
+}*/
+
+.date > .dropdown-menu, .but > .dropdown-menu {
+    background-color: $nav-link;
 }
 
-.date > .dropdown-menu {
-    background-color: $nav-link;
+.but > .dropdown-menu > li > a:hover {
+    color: $nav-link;
 }
 
 
@@ -1250,18 +1273,58 @@ body.nav-expanded {
 /* ---------------------------------------------- /*
 * For masonry grid
 /* ---------------------------------------------- */
-.grid {
+/*.grid {
 	padding: 10px 10px 60px 10px;
 	max-width: 1300px;
 	margin: 0 auto;
 	list-style: none;
 	text-align: center;
-}
+}*/
 
 .grid-item 
-{ width: 200px; }
+{ 
+    width: 200px; 
+    margin-bottom: 10px;
+}
 
-.grid-item--width2 
+.brd {
+    border: 4px double $dark-clr; /* Параметры границы */
+    /*background: #fc3;  Цвет фона */
+    padding: 10px; /* Поля вокруг текста */
+   }
+
+.hoverzoom
+{
+    display:inline-block;
+/*    border:0;
+    width:196px;
+    height:210px;*/
+    position: relative;
+    -webkit-transition: all 200ms ease-in;
+    -webkit-transform: scale(1); 
+    -ms-transition: all 200ms ease-in;
+    -ms-transform: scale(1); 
+    -moz-transition: all 200ms ease-in;
+    -moz-transform: scale(1);
+    transition: all 200ms ease-in;
+    transform: scale(1);   
+
+}
+.hoverzoom:hover
+{
+    box-shadow: 0px 0px 150px #000000;
+    z-index: 2;
+    -webkit-transition: all 200ms ease-in;
+    -webkit-transform: scale(1.2);
+    -ms-transition: all 200ms ease-in;
+    -ms-transform: scale(1.2);   
+    -moz-transition: all 200ms ease-in;
+    -moz-transform: scale(1.2);
+    transition: all 200ms ease-in;
+    transform: scale(1.2);
+}
+
+/*.grid-item--width2 
 { width: 400px; }
 
 .grid-blog {
@@ -1329,9 +1392,9 @@ body.nav-expanded {
 	color: #fff;
 }
 
-/* Individual Caption Styles */
+ Individual Caption Styles 
 
-/* Caption Style 1 */
+ Caption Style 1 
 .cs-style-1 figcaption {
 	height: 100%;
 	width: 100%;
@@ -1366,7 +1429,7 @@ body.nav-expanded {
 	margin-top: 30px;
 }
 
-/* Caption Style 2 */
+ Caption Style 2 
 .cs-style-2 figure img {
 	z-index: 10;
 	-webkit-transition: -webkit-transform 0.4s;
@@ -1395,7 +1458,7 @@ body.nav-expanded {
 	top: 30px;
 }
 
-/* Caption Style 3 */
+ Caption Style 3 
 .cs-style-3 figure {
 	overflow: hidden;
 }
@@ -1447,7 +1510,7 @@ body.nav-expanded {
 	right: 20px;
 }
 
-/* Caption Style 4 */
+ Caption Style 4 
 .cs-style-4 li {
 	-webkit-perspective: 1700px;
 	-moz-perspective: 1700px;
@@ -1516,7 +1579,7 @@ body.nav-expanded {
 	right: 20px;
 }
 
-/* Caption Style 5 */
+ Caption Style 5 
 .cs-style-5 figure img {
 	z-index: 10;
 	-webkit-transition: -webkit-transform 0.4s;
@@ -1563,7 +1626,7 @@ body.nav-expanded {
 	right: 20px;
 }
 
-/* Caption Style 6 */
+ Caption Style 6 
 .cs-style-6 figure img {
 	z-index: 10;
 	-webkit-transition: -webkit-transform 0.4s;
@@ -1594,7 +1657,7 @@ body.nav-expanded {
 	right: 20px;
 }
 
-/* Caption Style 7 */
+ Caption Style 7 
 .cs-style-7 li:first-child { z-index: 6; }
 .cs-style-7 li:nth-child(2) { z-index: 5; }
 .cs-style-7 li:nth-child(3) { z-index: 4; }
@@ -1655,7 +1718,7 @@ body.nav-expanded {
 	-moz-transition: opacity 0.3s 0.2s;
 	transition: opacity 0.3s 0.2s;
 	opacity: 1;
-}
+}*/
 
 @media screen and (max-width: 31.5em) {
 	.grid {
@@ -1885,7 +1948,7 @@ ul.side-pills > li:not(.active) > a:active > h5 > i
    -moz-transition: all 500ms cubic-bezier(0.250, 0.100, 0.250, 1.000); 
      -o-transition: all 500ms cubic-bezier(0.250, 0.100, 0.250, 1.000); 
         transition: all 500ms cubic-bezier(0.250, 0.100, 0.250, 1.000); /* ease (default) */  
-    transform: translateX(-10px) scale(1.25);//rotate(360deg) 
+    transform: translateX(-6px) scale(1.25);//rotate(360deg) 
 }
 
 .panel-collapse > ul > li > a {

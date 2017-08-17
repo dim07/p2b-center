@@ -1,5 +1,11 @@
 {% extends 'myforms.html.twig' %}
 
+{% set project = stageOrder.stage.project %}
+{% set IsContractor = (app.user.id == project.ContractorId) %}
+{% set IsCustomer = (app.user.id == project.CustomerId) %}
+{% set IsGip = (app.user.id == project.gipId) %}
+{% set IsEditor = is_granted('ROLE_ADMIN') or IsContractor or IsCustomer %}
+
 {% block title %}
 {{ parent() }} -  Редактирование заказа
 {% endblock %}
@@ -16,7 +22,7 @@
                 </a>
             </li>
             <li>
-                <a class="btn btn-link" href="{{ path('projectstage_edit', { 'id':  stageOrder.idStage }) }}">
+                <a class="btn btn-link {% if not IsEditor %}disabled{% endif %}" href="{{ path('projectstage_edit', { 'id':  stageOrder.idStage }) }}">
                     {{ stageOrder.stage.name }}
                 </a>
             </li>   
@@ -30,85 +36,249 @@
 
 {{ form_start(edit_form) }}    
 <div class ="col-md-12">
-    {% include "stageorder/_form.html.twig"   with {'form': edit_form} %}
+    {% if is_granted('ROLE_ADMIN') or not stageOrder.offerId %}
+        {% include 'stageorder/_form.html.twig'   with {'form': edit_form } %}
+    {% else %}
+        {% include 'stageorder/_form_d.html.twig'   with {'form': edit_form } %}
+    {% endif %}    
 </div>      
 <div class="row text-center">
+    {% if IsEditor %}
     <button type="submit" class="btn btn-lg btn-primary">
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Сохранить
     </button>
+    {% endif %}
 </div>
 {{ form_end(edit_form) }}
 
-<div class ="col-md-12">
-    <div class="row">
-        <div class="col-lg-6">
-            <button class="btn btn-lg btn-default" type="button" data-toggle="collapse" data-target="#collapsePays" aria-expanded="true" aria-controls="collapsePays">
-                Выплаты
-                <span class="caret"></span>
-            </button>
-        </div>    
-    </div>
-    <div class="row collapse in" id="collapsePays">    
-        <div class="col-md-6">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                  <h3 class="panel-title">Создание выплаты</h3>
-                </div>
-                <div class="panel-body">
-                    {{ form_start(new_pay_form, {'action': path('orderpay_new', { 'order_id': stageOrder.id }), 'method': 'post'}) }}
-                    {#{{ form_widget(new_stage_form) }}#}
-                    {% include "orderpay/_form.html.twig"   with {'form': new_pay_form} %}
-                    <p class="text-center">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fa fa-plus" aria-hidden="true"></span> Добавить
-                        </button>
-                    </p>
-                    {{ form_end(new_pay_form) }} 
-                </div>
-            </div>
 
-        </div>    
-                
-        {% set s1 = 0 %}
-        {% set s2 = 0 %}
-        {% for pay in stageOrder.pays %}
-           {% if pay.factPay %} 
-               {% set s1 = s1 + pay.factPay %} 
-           {% endif %} 
-           {% if pay.planPay %} 
-               {% set s2 = s2 + pay.planPay %} 
-           {% endif %} 
-        {% endfor %}        
-        <div class="col-md-6">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                  <h3 class="panel-title"><span class="badge pull-right">{{ s1 }} ({{ s2 }})</span>Список выплат</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group">
-                      {% for pay in stageOrder.pays %}
-                          <a href="{{ path('orderpay_edit', { 'id':  pay.id }) }}" class="list-group-item"><span class="badge">{{ pay.factPay }} ({{ pay.planPay }})</span>{{ pay.PayDate|date('d.m.Y') }}</a>
-                      {% endfor %}
-                    </div> 
-                </div>
-            </div>
-        </div>  
-    </div>
-</div>    
+{% set events = stageOrder.events %}
+{% set pays = stageOrder.pays %}
+{% set offers = stageOrder.offers %}
 
-   
+<!-- Modal -->
+<div class="modal fade" id="add_pay_{{ stageOrder.id }}" {#tabindex="-1"#} role="dialog" aria-labelledby="myModalLabe2">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {{ form_start(new_pay_form, {'action': path('orderpay_new', { 'order_id': stageOrder.id }), 'method': 'post'}) }}
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Новая выплата для заказа ID:{{ stageOrder.id }}</h4>
+            </div>
+            <div class="modal-body">
+
+                {% include "orderpay/_form.html.twig"   with {'form': new_pay_form} %}
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-save" aria-hidden="true"></span> Сохранить
+                </button>        
+                <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+            </div>
+            {{ form_rest(new_pay_form) }}
+            {{ form_end(new_pay_form) }} 
+        </div>
+    </div>
+</div> 
+        
+<!-- Modal -->
+<div class="modal fade" id="add_event_{{ stageOrder.id }}" {#tabindex="-1"#} role="dialog" aria-labelledby="myModalLabe2">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {{ form_start(new_event_form, {'action': path('stageorderevent_new', { 'order_id': stageOrder.id }), 'method': 'post'}) }}
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Новое событие для заказа ID:{{ stageOrder.id }}</h4>
+            </div>
+            <div class="modal-body">
+
+                {% include "stageorderevent/_form.html.twig"   with {'form': new_event_form} %}
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-save" aria-hidden="true"></span> Сохранить
+                </button>        
+                <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+            </div>
+            {{ form_rest(new_event_form) }}
+            {{ form_end(new_event_form) }} 
+        </div>
+    </div>
+</div>        
+
+<div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active"><a href="#predl-{{ stageOrder.id }}" aria-controls="predl-{{ stageOrder.id }}" role="tab" data-toggle="tab">Предложения</a></li>  
+      <li role="presentation"><a href="#events-{{ stageOrder.id }}" aria-controls="events-{{ stageOrder.id }}" role="tab" data-toggle="tab">События</a></li>
+      <li role="presentation"><a href="#pays-{{ stageOrder.id }}" aria-controls="pays-{{ stageOrder.id }}" role="tab" data-toggle="tab">Выплаты</a></li>
+      <li role="presentation"><a href="#tabel-{{ stageOrder.id }}" aria-controls="tabel-{{ stageOrder.id }}" role="tab" data-toggle="tab">Табель</a></li>
+      
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane" id="events-{{ stageOrder.id }}">
+            <table class="table table-condensed" style="background-color: wheat">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        {#<th>ID</th>#}
+                        <th>Дата</th>
+                        <th>Тип события</th>
+                        <th>Примечание</th>
+                        <th>Файл</th>
+                        <th>
+                            <span data-toggle="modal" data-target="#add_event_{{ stageOrder.id }}">
+                            <a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="Добавить событие">
+                                <i class="fa fa-plus"></i> Событие
+                            </a>
+                            </span>    
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in events %}
+                    <tr>
+                    <td></td>    
+                    {#<td>{{ ev.id }}</td>#}    
+                    <td>{{ ev.eventDate ? ev.eventDate|date('d.m.Y') }}</td>
+                    <td>{{ ev.EventType ? ev.EventType }}</td>
+                    <td>{{ ev.EventType ? ev.info }}</td>
+                    <td align="center">{% if ev.File|length > 0 %}<a href="{{ asset('uploads/docs/' ~ ev.File) }}" data-title="{{ ev.File }}" ><i class="fa fa-2x fa-{{ ev.File|icon }}"></i></a>{% endif %}</td>
+                    <td><a href="{{ path('stageorderevent_edit', { 'id':  ev.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать событие"><i class="fa fa-pencil"></i> </a></td>
+                    </tr>
+                    {% endfor %}    
+                </tbody>    
+            </table>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="pays-{{ stageOrder.id }}">
+            <table class="table table-condensed" style="background-color: wheat">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>ID</th>
+                        <th>Величина заявленная</th>
+                        <th>Величина утвержденная</th>
+                        <th>Дата выплаты</th>
+                        <th>Дата начисления</th>
+                        <th>Дата заявления на выплату</th>
+                        <th>
+                            {% if IsEditor %}
+                            <span data-toggle="modal" data-target="#add_pay_{{ stageOrder.id }}">
+                            <a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="Добавить выплату">
+                                <i class="fa fa-plus"></i> Выплата
+                            </a>
+                            </span> 
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set s1 = 0 %}
+                    {% set s2 = 0 %}
+                    {% for pay in pays %}
+                        {% if pay.factPay %} 
+                            {% set s1 = s1 + pay.factPay %} 
+                        {% endif %} 
+                        {% if pay.planPay %} 
+                            {% set s2 = s2 + pay.planPay %} 
+                        {% endif %}
+                    <tr>
+                    <td></td>    
+                    <td>{{ pay.id }}</td>    
+                    <td>{{ pay.planPay ? pay.planPay }}</td>
+                    <td>{{ pay.factPay ? pay.factPay }}</td>
+                    <td>{{ pay.payDate ? pay.payDate|date('d.m.Y') }}</td>
+                    <td>{{ pay.factPay ? pay.chargDate|date('d.m.Y') }}</td>    
+                    <td>{{ pay.statementDate ? pay.statementDate|date('d.m.Y') }}</td>
+                    <td>{% if IsEditor %}<a href="{{ path('orderpay_edit', { 'id':  pay.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать выплату"><i class="fa fa-pencil"></i> </a>{% endif %}</td>
+                    </tr>
+                    {% endfor %}    
+                </tbody> 
+                <tfoot>
+                    <tr>
+                        <th></th><th></th><th>{{ s2 }}</th><th>{{ s1 }}</th><th></th><th></th><th></th><th></th>
+                    </tr>    
+                </tfoot>
+                    
+            </table>
+        </div>
+      <div role="tabpanel" class="tab-pane" id="tabel-{{ stageOrder.id }}">...</div>
+      <div role="tabpanel" class="tab-pane active" id="predl-{{ stageOrder.id }}">
+            <table class="table table-condensed" style="background-color: wheat">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>ID</th>
+                        {% if stageOrder.isLegalEntity %} 
+                            <th>Субподрядчик</th>
+                        {% else %}    
+                            <th>Исполнитель</th>
+                        {% endif %}        
+                        <th>Стоимость, руб.</th>
+                        <th>Срок, нед.</th>
+                        <th>Информация</th>
+                        <th>Выбор</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in offers %}
+                        {% set ind = 'offer' ~ offer.id %}
+                    <tr>
+                    <td></td>    
+                    <td>{{ offer.id }}</td>    
+                    {% if stageOrder.isLegalEntity %} 
+                        <td>{{ offer.legal }}</td>
+                    {% else %}    
+                        <td>{{ offer.user }}</td>
+                    {% endif %}
+                    <td>{{ offer.cost }}</td>
+                    <td>{{ offer.period }}</td>
+                    <td>{{ offer.info }}</td>
+                    <td>{% if offer.id == stageOrder.offerId %} <i class="fa fa-check" ></i> {% endif %}</td>
+                    <td>
+                        {% if is_granted('ROLE_ADMIN') or not stageOrder.offerId %}
+                        <form action="{{ path('stageorder_choose_offer', { 'id': stageOrder.id, 'offer_id': offer.id}) }}" method="post" style="display: inline-block">
+                            {{ form_widget(ofrForms[ind]) }}
+                            {% if IsEditor %}
+                            <button class="btn btn-danger btn-xs" type="submit" onclick="return confirm('Вы уверены что хотите выбрать предложение с Id: {{ offer.id }}\n с исполнителем {{ offer.user.fio }}\n  на раздел {{ stageOrder.name }}\n за {{ offer.cost }} рублей?');">
+                                <span class="fa fa-check-square" aria-hidden="true"></span>
+                                Выбрать
+                            </button>
+                            {% endif %}    
+                        </form>
+                        {% endif %}        
+                    </td>
+                    </tr>
+                    {% endfor %}    
+                </tbody>    
+            </table>
+          
+      </div>
+    </div>
+</div>
+
+
+  
 <hr/>
 
     
 <div class="form-group col-md-12">
+    {% if IsEditor %}
     <a class="btn btn-default" href="{{ path('projectstage_edit', { 'id':  stageOrder.idStage }) }}">
         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
         Назад к этапу
     </a>
+    {% endif %}    
     {#<a class="btn btn-info" href="{{ path('stageorder_new') }}">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
         New
     </a>#}
+    {% if is_granted('ROLE_ADMIN') %}
     <form action="{{ path('stageorder_delete', { 'id': stageOrder.id }) }}" method="post" style="display: inline-block">
         <input type="hidden" name="_method" value="DELETE" />
         {{ form_widget(delete_form) }}
@@ -117,6 +287,7 @@
             Удалить заказ
         </button>
     </form>
+    {% endif %}    
 </div>
 
 </div>
@@ -124,3 +295,12 @@
 
 {% endblock %}
 
+{% block javascripts %} 
+    {{ parent() }}
+    <script>
+        $("#stage_order_section").change(function(){
+            var $name = $("#stage_order_name");
+            $name.val($("#stage_order_section option:selected").text());
+        }); 
+    </script>
+{% endblock %}

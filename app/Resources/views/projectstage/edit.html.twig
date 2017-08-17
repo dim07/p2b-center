@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-md-4">{{ form_row(edit_form.num) }}</div>
         <div class="col-md-4">{{ form_row(edit_form.cost) }}</div>
-        <div class="col-md-4">{{ form_row(edit_form.endDate) }}</div>
+        <div class="col-md-4">{{ form_row(edit_form.endDate) }}{{ form_row(edit_form.FactEndDate) }}</div>
     </div>    
     {{ form_row(edit_form.info) }}
 </div>    
@@ -116,3 +116,12 @@
 
 {% endblock %}
 
+{% block javascripts %} 
+    {{ parent() }}
+    <script>
+        $("#stage_order_section").change(function(){
+            var $name = $("#stage_order_name");
+            $name.val($("#stage_order_section option:selected").text());
+        }); 
+    </script>
+{% endblock %}

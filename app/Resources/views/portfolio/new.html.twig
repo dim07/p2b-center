@@ -1,58 +1,201 @@
-{% extends 'base.html.twig' %}
+{% extends 'myforms.html.twig' %}
 
 {% block title %}
-{{ parent() }} - New portfolio
+{{ parent() }} - Новая работа в портфолио
 {% endblock %}
 
 {% block body %}
 
 <div id="top" class="row">
     <div class="page-header">
-        <h2>New portfolio <span class="glyphicon glyphicon-file" aria-hidden="true"></span> </h2>
+        <h2 class="text-center">Новая работа в портфолио <span class="fa fa-plus-circle" aria-hidden="true"></span> </h2>
     </div>
 </div>
-    
-    
     
 <div class="row">
-    <div class="row">
-    <div class="col-md-12">
-        {% for type, flashMessages in app.session.flashbag.all() %} 
-        {% for flashMessage in flashMessages %}
-        <div class="alert alert-{{ type }}">
-            {{ flashMessage|raw }}
-        </div>
-         {% endfor %} 
-         {% endfor %} 
-    </div>
-</div>
-    
-
     {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <p>
-        <button type="submit" name="submit" value="save" class="btn btn-primary"> 
-            Save <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+    {% include "portfolio/_form.html.twig"   with {'form': form} %}
+    <div class="col-md-12 text-right">
+        <button type="submit" name="submit" value="save" class="btn btn-lg btn-primary"> 
+            Сохранить <span class="fa  fa-save" aria-hidden="true"></span>
         </button>
-        <button type="submit" name="submit" value="saveAndAdd" class="btn btn-info"> 
-            Save and Add <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-        </button>
-    </p>
-
+    </div>
 
     {{ form_end(form) }}
-
-    <hr/>
+</div>
+<hr/>
 
 <div class="form-group">
-    <a class="btn btn-default" href="{{ path('portfolio') }}">
-        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-        Back to list
+    <a class="btn btn-default" href="{{ path('portfolio_user') }}">
+        <span class="fa fa-list" aria-hidden="true"></span>
+        Вернуться в портфолио
     </a>
 </div>
 
-</div>
-
-
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        var $object = $('#portfolio_object');
+        $(function(){
+            $object.change(function(){
+                // ... retrieve the corresponding form.
+                var $form = $(this).closest('form');
+                // Simulate form data, but only include the selected sport value.
+                var data = {};
+                data[$object.attr('name')] = $object.val();
+
+                $.ajax({
+                    type: $form.attr('method'),
+                    url: $form.attr('action'),
+                    data: data,
+                    success: function(html) {
+                        // Replace current position field ...
+                        $("#portfolio_subobject").replaceWith(
+                          // ... with the returned one from the AJAX response.
+                          $(html).find('#portfolio_subobject')
+                        );
+                        // Position field now displays the appropriate positions.
+                    }
+                });
+               
+                
+            });
+        });
+        
+        function addTagFormDeleteLink($tagFormLi) {
+            var $removeFormA = $('<div class="col-md-12"><a class="btn btn-sm btn-danger" href="#"><i class="fa fa-remove"></i> Удалить</a></div>');
+            $tagFormLi.append($removeFormA);
+            $removeFormA.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // remove the li for the tag form
+                $tagFormLi.remove();
+            });
+        }
+        
+        function addTagForm($collectionHolder, $newLinkLi) {
+            // Get the data-prototype explained earlier
+            var prototype = $collectionHolder.data('prototype');
+
+            // get the new index
+            var index = $collectionHolder.data('index');
+
+            // Replace '__name__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            var newForm = prototype.replace(/__name__/g, index);
+
+            // increase the index with one for the next item
+            $collectionHolder.data('index', index + 1);
+
+            // Display the form in the page in an li, before the "Add a tag" link li
+            var $newFormLi = $('<div class="file col-md-4"></div>').append(newForm);
+            $newLinkLi.before($newFormLi);
+            
+            // add a delete link to the new form
+            addTagFormDeleteLink($newFormLi);
+        }
+        
+        var $collectionHolder;
+
+        // setup an "add a tag" link
+        var $addTagLink = $('<br><a class="add_file_link btn btn-sm btn-success" href="#"><i class="fa fa-plus"></i> Добавить файл</a>');
+        var $newLinkLi = $('<div class="col-md-12 text-center"></div>').append($addTagLink);
+
+        jQuery(document).ready(function() {
+            //$('.jb_fileupload').jbFileUpload();
+            // Get the ul that holds the collection of tags
+            $collectionHolder = $('div.files');
+            //$head = $('h3.files-l'); 
+            // add the "add a tag" anchor and li to the tags ul
+            $collectionHolder.append($newLinkLi);
+            //$head.append($newLinkLi);
+            // add a delete link to all of the existing tag form li elements
+            $collectionHolder.find('.file').each(function() {
+                addTagFormDeleteLink($(this));
+            });
+
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+            $addTagLink.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // add a new tag form (see next code block)
+                addTagForm($collectionHolder, $newLinkLi);
+                $('.jb_fileupload').jbFileUpload();
+            });
+        });
+        
+    </script>
+    
+{#    <script>
+        var $sector = $('#portfolio_sector');
+
+        $(function(){
+            $sector.change(function(){
+                // ... retrieve the corresponding form.
+                var $form = $(this).closest('form');
+                // Simulate form data, but only include the selected sport value.
+                var data = {};
+                data[$sector.attr('name')] = $sector.val();
+
+                $.ajax({
+                    type: $form.attr('method'),
+                    url: $form.attr('action'),
+                    data: data,
+                    success: function(html) {
+                        // Replace current position field ...
+                        $("#portfolio_object").replaceWith(
+                          // ... with the returned one from the AJAX response.
+                          $(html).find('#portfolio_object')
+                        );
+                        // Position field now displays the appropriate positions.
+                        
+                        var $subobject = $("#portfolio_sub");
+                        $subobject.find('option').remove();
+                        $subobject.append('<option value></option>');
+                        
+                        $("#portfolio_object").change(function(){
+                            // ... retrieve the corresponding form.
+                            var $form = $(this).closest('form');
+                            // Simulate form data, but only include the selected sport value.
+                            var data = {};
+                            var $object = $("#portfolio_object");
+                            var $subobject = $("#portfolio_sub");
+                            $subobject.find('option').remove();
+                            $subobject.append('<option value></option>');
+                            data['data'] = $object.val();
+                            $.ajax({
+                                type: 'post',
+                                url: '{{ path('portfolio_ajax_subobjects') }}',
+                                dataType: 'json',
+                                data: data,
+                                success: function (json) {
+                                     //console.log(json);
+                                    var $i = 0; 
+                                    $.each(json, function (index, value) {
+                                        $subobject.append('<option value="' + index + '">' + value + '</option>');
+                                        $i++;
+                                        //$('#loading').remove();
+                                    });
+                                    $subobject.disabled = ($i === 0);
+                                }
+                            });
+                        }); 
+                        
+                    }
+                });
+               
+                
+            });
+            
+            
+        });
+    </script> #}
+{% endblock %}

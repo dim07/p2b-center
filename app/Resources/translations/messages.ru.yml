@@ -1,4 +1,5 @@
 User: Пользователь
+Id user: Id польз.
 Group: Группа
 Specialization: Специализация
 Section: Раздел
@@ -14,4 +15,18 @@ Region: Регион
 Rating: Рейтинг
 Fio: ФИО
 Phone: Телефон
-
+Import a file: Загрузить файл
+error.whitelist: Неподходящий тип файла 
+Remove: Удалить
+LegalEntity: Юрлицо
+Legal adr: Юридический адрес
+Hide name: Скрывать имя
+Customer: Заказчик
+Contractor: Подрядчик
+Object: Объект
+Objects: Объекты
+Sector: Отрасль
+Subobject: Подобъект
+Subobjects: Подобъекты
+SubObjectItem: Подпункт
+Items: Подпункты

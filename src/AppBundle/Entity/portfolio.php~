@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * portfolio
@@ -49,10 +50,49 @@ class portfolio
     private $idSection;
     
     /**
-     * @ORM\OneToOne(targetEntity="Section")
+     * @ORM\ManyToOne(targetEntity="Section")
      * @ORM\JoinColumn(name="id_section", referencedColumnName="id")
      */
     private $section;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="sectorId", type="integer")
+     */
+    private $sectorId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Sector")
+     * @ORM\JoinColumn(name="sectorId", referencedColumnName="id")
+     */
+    private $sector;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="objectId", type="integer")
+     */
+    private $objectId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="SectorObject")
+     * @ORM\JoinColumn(name="objectId", referencedColumnName="id")
+     */
+    private $object;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="subobjectId", type="integer")
+     */
+    private $subobjectId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="SubObject")
+     * @ORM\JoinColumn(name="subobjectId", referencedColumnName="id")
+     */
+    private $subobject;
 
     /**
      * @var \DateTime

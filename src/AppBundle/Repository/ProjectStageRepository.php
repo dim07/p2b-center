@@ -10,4 +10,67 @@ namespace AppBundle\Repository;
  */
 class ProjectStageRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function paysGroupedByMonth($stageId, $year)
+    {
+        $pays = array();
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT SUM(p.factPay) as summa, SUBSTRING(p.payDate, 6, 2) as Month FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' WHERE o.idStage='.$stageId.' AND SUBSTRING(p.payDate, 1, 4) = '.$year.
+                    ' GROUP BY Month'
+            )
+            ->getResult();
+        foreach ($results as $result) {
+            $pays[$result['Month']] = $result['summa'];
+        }
+//        $pays['summa'] = $this->sumOfPays($orderId);
+        return $pays;
+    }
+    
+    public function paysLastYearGroupedByMonth($stageId, \DateTime $dt2 = null)
+    {
+        if (is_null($dt2)) {
+            $d2 = new \DateTime('last day of this month');
+            $d2->setTime(23,59,59);
+            $d1 = new \DateTime('-1 year');
+            $d1->modify('first day of this month');
+        } else {
+            $d2 = clone $dt2;
+            $d1 = clone $dt2;
+            $d1->modify('-1 year');
+            $d1->modify('first day of this month');
+        } 
+        $pays = array();
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT SUM(p.factPay) as summa, SUBSTRING(p.payDate, 3, 5) as Month FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' WHERE o.idStage='.$stageId.' AND p.payDate >= :d1 AND p.payDate <= :d2 '.
+                    ' GROUP BY Month'
+            ) 
+             ->setParameter('d1', $d1)->setParameter('d2', $d2)
+            ->getResult();
+        foreach ($results as $result) {
+            $pays[substr($result['Month'],3,2).'.'.substr($result['Month'],0,2)] = $result['summa'];
+        }
+        return $pays;
+    }
+    
+    public function paysFromPeriodGroupedByMonth($stageId, \DateTime $dt1, \DateTime $dt2)
+    {
+        $pays = array();
+        $results = $this->getEntityManager()
+            ->createQuery(
+                'SELECT SUM(p.factPay) as summa, SUBSTRING(p.payDate, 3, 5) as Month FROM AppBundle:OrderPay p'.
+                    ' JOIN p.order o'.
+                    ' WHERE o.idStage='.$stageId.' AND p.payDate >= :d1 AND p.payDate <= :d2'.
+                    ' GROUP BY Month ORDER BY Month'
+            ) ->setParameters(array('d1' => $dt1,'d2' => $dt2))
+            ->getResult();
+        foreach ($results as $result) {
+            $pays[substr($result['Month'],3,2).'.'.substr($result['Month'],0,2)] = $result['summa'];
+        }
+        return $pays;
+    }
 }

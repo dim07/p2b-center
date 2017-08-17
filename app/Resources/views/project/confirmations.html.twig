@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Утверждение заявок на выплаты по проекту
+{% endblock %}
+
+{% block body %}
+    
+<div id="top" class="row">
+    <div class="page-header col-md-12 text-center">
+                <h2><a href="{{ path('project_report_money', { 'id': project.id }) }}">Утверждение заявок на выплаты по проекту</a></h2><br> 
+                <h4><a href="{{ path('project_report_money', { 'id': project.id }) }}">"{{ project.name }}"<br>
+                    на {{ "now"|date("d.m.Y") }}</a></h4> 
+    </div>
+</div> <hr> 
+{#
+{% set CurY = "now"|date("Y") %}
+{% set CurM = "now"|date("m") %}
+{% set Mns = {'01':'Январь','02':'Февраль','03':'Март','04':'Апрель','05':'Май','06':'Июнь','07':'Июль','08':'Август','09':'Сентябрь','10':'Октябрь','11':'Ноябрь','12':'Декабрь'} %}
+#}
+
+{{ form_start(form) }}
+<div class="row">
+    <div class="table-responsive col-md-12">
+        <table class="table table-striped table-hover table-bordered" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th rowspan="2">Наименование</th>
+                    <th rowspan="2">Исполнитель (ФИО)</th>
+                    <th rowspan="2">План, руб.</th>
+                    <th rowspan="2">Остаток, руб.</th>
+                    <th colspan="11">Начислено</th>
+                    <th style="width:130px">Заявка</th>
+                    <th style="width:130px">Утверждение</th>
+                </tr>
+                <tr>
+                    {% for mn in mns %}
+                        <th>{{ mn }}</th>    
+                    {% endfor %}  
+                    <th>{{ "now"|date("m.y") }}</th>
+                </tr>    
+            </thead>
+            {% set doh = 0 %}
+            {% set ras1 = 0 %}
+            {% set ras2 = 0 %}
+            {% set sumProjPays = 0 %}
+            {% set sumProjOst = 0 %}
+            {% set sumProjOstLeg = 0 %}
+            {% set sumProjOstIsp = 0 %}
+            <tbody>
+            {% for stage in project.stages %}
+                    {% set sumStagePays = 0 %}
+                      
+                    {% set sumProjPays = sumProjPays+sumStagePays %}
+                    {% set sumStageOst = stage.cost - (stage.FactEndDate and (stage.FactEndDate|date("m.y") in mns) ? stage.cost : 0 ) %}
+                    {#{% set sumProjOst = sumProjOst + sumStageOst %}#}
+                <tr>
+                    <td><strong>{{ stage.name }}</strong></td>
+                    <td></td>
+                    <td><strong>{{ stage.cost }}</strong></td>
+                    <td><strong>{{ sumStageOst }}</strong></td>
+
+                    {% for mn in mns %}
+                        {% if stage.FactEndDate and (mn == stage.FactEndDate|date("m.y")) %}
+                            <td><strong>
+                            {{ stage.cost }}
+                            </strong></td>
+                        {% else %}
+                            <td><strong>
+                            </strong></td>
+                        {% endif %}    
+                    {% endfor %}
+                    {% set doh = doh+stage.cost %}
+                </tr>
+                {% for order in stage.orders %}
+                        {% set pays = order.datas %} {#{{ dump(pays) }}#}
+                    <tr>
+                    <td>{{ order.name }}</td>
+                    <td>
+                        {% if order.IsLegalEntity %}
+                        {{ order.Contractor }}   
+                        {% set ras1 = ras1 - order.cost %}
+                        {% else %}
+                        {{ order.UserIsp.fio }}    
+                        {% set ras2 = ras2 - order.cost %}
+                        {% endif %}
+                    </td>
+                    <td>{{ -order.cost }}</td>
+                    {% set doh = doh-order.cost %}
+                    
+                    {% set ost = order.cost - pays['summa']%}
+                    {% if order.IsLegalEntity %}
+                        {% set sumProjOstLeg = sumProjOstLeg + ost %}
+                    {% else %}    
+                        {% set sumProjOstIsp = sumProjOstIsp + ost %}
+                    {% endif %}
+                    
+                    <td>{{ -ost|round(2) }}</td>
+                    {% for key,mn in mns %}
+                        {% if key == 11 and not order.IsLegalEntity %}
+                            <td>
+                        {{ form_errors(form['planPay'~order.id]) }}
+                        {{ form_widget(form['planPay'~order.id], { 'attr': {'class': 'input-sm'} }) }} 
+                            </td>
+                            <td>
+                        {{ form_errors(form['factPay'~order.id]) }}
+                        {{ form_widget(form['factPay'~order.id], { 'attr': {'class': 'input-sm'} }) }} 
+                            </td>
+                        {% else %}    
+                            <td> {% if mn in pays|keys %} 
+                                    {{ -pays[mn] }} 
+                                 {% endif %}
+                            </td>
+                        {% endif %}    
+                    {% endfor %}  
+                    
+                    </tr> 
+                {% endfor %}    
+            {% endfor %}
+            </tbody>
+            {% set sumProjOst = sumProjOstLeg + sumProjOstIsp %}
+            <tfooter>
+                <tr>
+                    <td>Итого Доход</td>
+                    <td></td>
+                    <td><strong>{{ doh| round(2) }}</strong></td>
+                    <td><strong>{{ -sumProjOst| round(2) }}</strong></td>
+                    {% for mn in mns %}
+                            <td><strong>
+                            {% set mn_doh = stagesSumByMonth[mn] - (mn in project.datas|keys ? project.datas[mn] : 0) - (mn in project.datas1|keys ? project.datas1[mn] : 0) %}
+                            {{ not mn_doh == 0 ? mn_doh| round(2) }}
+                           </strong></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Итого расход по субподрядчикам</td>
+                    <td></td>
+                    <td><strong>{{ ras1| round(2) }}</strong></td>
+                    <td>{{ -sumProjOstLeg| round(2) }}</td>
+                    {% for mn in mns %}
+                            <td><strong>
+                            {% if mn in project.datas|keys %}
+                            {{ -project.datas[mn]| round(2) }}    
+                            {% endif %}
+                            </strong></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Итого расход по исполнителям</td>
+                    <td></td>
+                    <td><strong>{{ ras2| round(2) }}</strong></td>
+                    <td>{{ -sumProjOstIsp| round(2) }}</td>
+                    {% for mn in mns %}
+                            <td><strong>
+                            {% if mn in project.datas1|keys %}
+                            {{ -project.datas1[mn]| round(2) }}    
+                            {% endif %}
+                            </strong></td>
+                    {% endfor %}
+                </tr>
+
+            </tfooter>
+        </table>      
+    
+    </div>
+                
+                {#{{ dump(dmp) }}#}
+                          
+    <div class="col-md-7"><br>  
+        <a class="btn btn-default" href="{{ path('project') }}">
+            <span class="fa fa-list" aria-hidden="true"></span>
+            К списку проектов
+        </a>
+            
+        <a class="btn btn-primary" href="{{ path('project_edit', { 'id':  project.id }) }}">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            Редактировать проект
+        </a>    
+            
+           
+    </div>            
+    <div class="col-md-5 text-right"><br>   
+        <button type="submit" class="btn btn-primary">
+            <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
+        </button>
+    </div>    
+</div>  
+{{ form_end(form) }}            
+    
+{% endblock %}

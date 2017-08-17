@@ -3,26 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Resources/config/routing.yml</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/AppKernel.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/user/experts.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/_page_header.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/base.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/sass/styles.scss</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/stageorder/index.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/config/services.yml</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Repository/UserRepository.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/user/report_gip.html.twig</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Form/reportGipFilterType.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/UserController.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Form/UserType.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/default/index.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/sass/_bootstrap-variables.scss</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/config/config.yml</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Controller/LegalEntityController.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/translations/messages.ru.yml</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/web/js/template.js</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/user/index.html.twig</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/project/edit.html.twig</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/project.php</file>
+            <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/LegalEntity.php</file>
             <file>file:/C:/xampp/htdocs/p2p_site/src/AppBundle/Entity/User.php</file>
-            <file>file:/C:/xampp/htdocs/p2p_site/app/Resources/views/legalentity/index.html.twig</file>
         </group>
     </open-files>
 </project-private>

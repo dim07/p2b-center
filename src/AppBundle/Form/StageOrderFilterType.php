@@ -5,7 +5,8 @@ namespace AppBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use AppBundle\Form\Type\DateTimePickerType;
+//use AppBundle\Form\Type\DateTimePickerType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 
@@ -18,7 +19,7 @@ class StageOrderFilterType extends AbstractType
             ->add('section', Filters\EntityFilterType::class, array(
                     'class' => 'AppBundle\Entity\Section',
                     'choice_label' => 'name',
-                    'label' => 'Разделы специализаций',
+                    'label' => 'Виды работ',
                     'group_by' => 'spec',
                     'multiple' => TRUE,
                     'attr'   =>  array(
@@ -26,16 +27,24 @@ class StageOrderFilterType extends AbstractType
                         'style' => 'width: 100%'),
                     'required' => false
             ))     
-            ->add('isLegalEntity', Filters\BooleanFilterType::class, array(
-                    'label' => 'Заказ для подрядчика',
+            ->add('status',  ChoiceType::class, array(
+                'label' => 'Статус',
+                'apply_filter' => false, // disable filter
+                'required' => false,
+                'choices'  => array(
+                    'Любые' => 0,
+                    'Без исполнителя' => 1,
+                    'В работе' => 2,
+                    'Завершенные' => 3,
+                ),
             ))
-            ->add('startDate', Filters\DateRangeFilterType::class, [
-                'label' => 'Дата начала заказа',
-//                'left_date_options'
-
-                
-            ])   
-            ->add('isPublic', Filters\BooleanFilterType::class)
+//                        ->add('startDate', Filters\DateRangeFilterType::class, [
+//                'label' => 'Дата начала заказа',
+////                'left_date_options'
+//
+//                
+//            ])   
+//            ->add('isPublic', Filters\BooleanFilterType::class)
                          
 //            ->add('Contractor', Filters\EntityFilterType::class, array(
 //                    'class' => 'AppBundle\Entity\LegalEntity',

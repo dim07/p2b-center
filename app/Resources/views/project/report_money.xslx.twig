@@ -1,0 +1,154 @@
+{% xlsdocument %}
+    {% xlssheet 'Worksheet' %}
+    
+
+        {% xlsrow %}
+            {% xlscell { style: { font: { size: '18' } }, merge': 16 } %}Доходы и расходы по проекту{% endxlscell %}
+        {% endxlsrow %}  
+        {% xlsrow %}
+            {% xlscell %}"{{ project.name }}"{% endxlscell %}
+        {% endxlsrow %}                
+        {% xlsrow %}                
+            {% xlscell %}на {{ "now"|date("d.m.Y") }}{% endxlscell %}
+        {% endxlsrow %}
+
+
+{% set CurY = "now"|date("Y") %}
+{% set CurM = "now"|date("m") %}
+{% set Mns = {'01':'Январь','02':'Февраль','03':'Март','04':'Апрель','05':'Май','06':'Июнь','07':'Июль','08':'Август','09':'Сентябрь','10':'Октябрь','11':'Ноябрь','12':'Декабрь'} %}
+
+
+<div class="row">
+    <div class="table-responsive col-md-12">
+        <table class="table table-striped table-hover table-bordered" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th rowspan="2">Наименование</th>
+                    <th rowspan="2">Исполнитель (ФИО)</th>
+                    <th rowspan="2">План, руб.</th>
+                    <th rowspan="2">Остаток (руб.)</th>
+                    <th colspan="12">Начислено (по месяцам, 12 мес., в конце - текущий)</th>
+                </tr>
+                <tr>
+                    {% for item in Mns %}
+                    {% if item != Mns[CurM] %}<th>{{ item }}</th>{% endif %}    
+                    {% endfor %}  
+                    <th>{{ Mns[CurM] }}</th>
+                </tr>    
+            </thead>
+            {% set doh = 0 %}
+            {% set ras1 = 0 %}
+            {% set ras2 = 0 %}
+            {% set sumProjPays = 0 %}
+            {% set sumProjOst = 0 %}
+            <tbody>
+                {% for stage in project.stages %}
+                    {% set sumStagePays = 0 %}
+                       
+                    {% set sumProjPays = sumProjPays+sumStagePays %}
+                    {% set sumStageOst = stage.cost - sumStagePays %}
+                    {% set sumProjOst = sumProjOst + sumStageOst %}
+                <tr>
+                    <td><strong>{{ stage.name }}</strong></td>
+                    <td></td>
+                    <td><strong>{{ stage.cost }}</strong></td>
+                    <td><strong>{{ sumStageOst }}</strong></td>
+                    {% for mn in Mns|keys %}
+                        {% if mn != CurM %}
+                            <td><strong>
+                            {% if mn in stage.datas|keys %}
+                            {{ -stage.datas[mn] }}    
+                            {% endif %}
+                            </strong></td>
+                        {% endif %}    
+                    {% endfor %}
+                    <td><strong>{% if CurM in stage.datas|keys %}{{ -stage.datas[CurM] }}{% endif %}</strong></td>
+                    
+                    {% set doh = doh+stage.cost %}
+                </tr>
+                    {% for order in stage.orders %}
+                        {% set pays = order.datas %} {#{{ dump(pays) }}#}
+                    <tr>
+                    <td>{{ order.name }}</td>
+                    <td>
+                        {% if order.IsLegalEntity %}
+                        {{ order.Contractor }}   
+                        {% set ras1 = ras1 - order.cost %}
+                        {% else %}
+                        {{ order.UserIsp.fio }}    
+                        {% set ras2 = ras2 - order.cost %}
+                        {% endif %}
+                    </td>
+                    <td>{{ -order.cost }}</td>
+                    {% set doh = doh-order.cost %}
+                    
+                    {% set ost = order.cost - pays['summa']%}
+                    <td>{{ ost }}</td>
+                    {% for mn,item in Mns %}
+                        {% if mn != CurM %}
+                            <td> {% if mn in pays|keys %} 
+                                    {{ -pays[mn] }} 
+                                 {% endif %}
+                            </td>
+                        {% endif %}    
+                    {% endfor %}  
+                    <td>{% if CurM in pays|keys %} {{ -pays[CurM] }} {% endif %}</td>
+                    
+                    </tr> 
+                    
+                    
+                        
+                        
+                    
+                    {% endfor %}    
+                {% endfor %}
+            </tbody>
+            <tfooter>
+                <tr>
+                    <td>Итого Доход</td>
+                    <td></td>
+                    <td><strong>{{ doh }}</strong></td>
+                    <td><strong>{{ sumProjOst }}</strong></td>
+                    
+                </tr>
+                <tr>
+                    <td>Итого расход по субподрядчикам</td>
+                    <td></td>
+                    <td><strong>{{ ras1 }}</strong></td>
+                    <td></td>
+                    {% for mn in Mns|keys %}
+                        {% if mn != CurM %}
+                            <td><strong>
+                            {% if mn in project.datas|keys %}
+                            {{ -project.datas[mn] }}    
+                            {% endif %}
+                            </strong></td>
+                        {% endif %}    
+                    {% endfor %}
+                    <td><strong>{% if CurM in project.datas|keys %}{{ -project.datas[CurM] }}{% endif %}</strong></td>
+                </tr>
+                <tr>
+                    <td>Итого расход по исполнителям</td>
+                    <td></td>
+                    <td><strong>{{ ras2 }}</strong></td>
+                    <td></td>
+                    {% for mn in Mns|keys %}
+                        {% if mn != CurM %}
+                            <td><strong>
+                            {% if mn in project.datas1|keys %}
+                            {{ -project.datas1[mn] }}    
+                            {% endif %}
+                            </strong></td>
+                        {% endif %}    
+                    {% endfor %}
+                    <td><strong>{% if CurM in project.datas1|keys %}{{ -project.datas1[CurM] }}{% endif %}</strong></td>
+                </tr>
+
+            </tfooter>
+        </table>      
+    
+    </div>
+</div>    
+    
+    {% endxlssheet %}
+{% endxlsdocument %}

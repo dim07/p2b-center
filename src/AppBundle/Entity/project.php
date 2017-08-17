@@ -336,5 +336,84 @@ class project
         return $this->getName();
     }
     
+    private $datas;
+    public function getDatas()
+    {
+        return $this->datas;
+    }
     
+    public function setDatas($datas)
+    {
+        $this->datas = $datas;
+        return $this;
+    }
+    
+    private $datas1;
+    public function getDatas1()
+    {
+        return $this->datas1;
+    }
+    
+    public function setDatas1($datas)
+    {
+        $this->datas1 = $datas;
+        return $this;
+    }
+    
+    public function getPlanCost()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+            $cost += $stage->getCost();
+        }
+        return $cost;
+    }
+    
+    public function getFactCost()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+            $fd = $stage->getFactEndDate();
+            if (!($fd === NULL)) {
+                $cost += $stage->getCost();
+            }    
+        }
+        return $cost;
+    }
+    
+    public function getSubCost()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+            $cost += $stage->getSubCost();
+        }
+        return $cost;
+    }
+    
+    public function getSubFactCost()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+            $cost += $stage->getSubFactCost();
+        }
+        return $cost;
+    }
+    
+    public function getIspCost()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+            $cost += $stage->getIspCost();
+        }
+        return $cost;
+    }
+    
+    public function getIspPays()
+    {
+        $cost = 0;
+        foreach ($this->stages as $stage) {
+                $cost += $stage->getIspPays();
+            }    
+        return $cost;
+    }
 }

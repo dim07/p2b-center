@@ -1,0 +1,398 @@
+{% set page_name = 'orders_u' %}
+{% extends 'myforms.html.twig' %}
+
+{% set gip = (app.user.gipprojects | length > 0) %}
+
+{% block title %}
+{{ parent() }} - Список работ - {{ app.user.fio }}
+{% endblock %}
+
+{% block body %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2><a href="{{ path('order_user') }}">Список работ - {{ app.user.fio }}</a></h2>
+        </div>
+    </div>       
+
+<!-- FILTERING -->
+<div class="col-md-12">
+    <div  id="filters" class="collapse">
+
+        <form class="well" action="{{ path('order_user') }}" method="get" >
+            <div class="row">
+                <div class="col-md-6">{{ form_row(filterForm.section) }}</div> 
+                <div class="col-md-6">{{ form_row(filterForm.status) }}</div>
+                
+
+                <div class="col-md-6">
+                    {{ form_rest(filterForm) }}
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-warning" name="filter_action" value="filter"> <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Выполнить отбор</button>
+                        <button type="submit" class="btn btn-default" name="filter_action" value="reset"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Сбросить фильтр</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- END FILTERING -->
+
+{% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+    
+<!-- Modal -->
+<div class="modal fade" id="GuestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Внимание</h4>
+      </div>
+      <div class="modal-body">
+          <h4>Эта функция доступна только вошедшим пользователям!</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        <a href="{{ path('fos_user_security_login') }}" class="btn btn-primary">Выполнить вход</a>
+        <a href="{{ path('fos_user_registration_register') }}" class="btn btn-info">Зарегистроваться</a>
+      </div>
+    </div>
+  </div>
+</div> 
+{% else %}    
+    {% for stageOrder in stageOrders %}
+    <!-- Modal -->
+    <div class="modal fade" id="add_offer_{{ stageOrder[0].Id }}" {#tabindex="-1"#} role="dialog" aria-labelledby="myModalLabe2">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                {% set ind = 'offer' ~ stageOrder[0].Id %}
+                {{ form_start(forms[ind], {'action': path('offer_new', { 'order_id': stageOrder[0].Id }), 'method': 'post'}) }}
+                {#{{ form_start(forms[ind], {'action': path('order_user'), 'method': 'post'}) }}#}
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Создать предложение по работе Id:{{ stageOrder[0].Id }}</h4>
+                </div>
+                <div class="modal-body">
+
+                    {% include "offer/_form.html.twig"   with {'form': forms[ind]} %}
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fa fa-save" aria-hidden="true"></span> Сохранить
+                    </button>        
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                </div>
+                {{ form_rest(forms[ind]) }}
+                {{ form_end(forms[ind]) }} 
+            </div>
+        </div>
+    </div>    
+    {% endfor %}                                
+  
+{% endif %}  
+<!-- Modal -->
+<div class="modal fade" id="NoOffersModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Внимание</h4>
+      </div>
+      <div class="modal-body">
+          <h4>По данной работе пока нет предложений.</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+
+      </div>
+    </div>
+  </div>
+</div>  
+
+<div class="col-md-3 pull-left">
+        
+    <!-- PAGE SIZE -->
+    <div class="pagination form-inline ">
+        <select class = "form-control"  onchange="window.location = this.value" >
+            <option value='{{ path('order_user', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
+            <option value='{{ path('order_user', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
+            <option value='{{ path('order_user', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
+            <option value='{{ path('order_user', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
+            <option value='{{ path('order_user', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
+        </select>
+    </div>
+    <!-- END PAGE SIZE -->
+
+</div>
+
+<div class="col-md-6">
+
+
+</div>
+
+<div class="col-md-3">
+    <a class="btn btn-info dropdown-toggle pull-right h3" data-toggle="collapse" data-target="#filters">
+        <i id="eye" class="fa fa-eye"></i> Фильтр
+    </a>
+</div>
+
+
+    
+    <div class="col-md-12">
+        {%- if form_errors(filterForm) %}
+        <div class="alert alert-block alert-error fade in form-errors">
+            {{ form_errors(filterForm) }}
+        </div>
+        {% endif %}
+    </div>
+
+</div> <!-- /#top -->
+   
+
+<div class="row">
+
+        <div class="table-responsive col-md-12">
+        <form method="POST" id="bulk_form" action="{{ path('stageorder_bulk_action') }} ">
+            <table class="table table-striped table-hover table-bordered" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        {#<th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>#}
+
+                            {% import "macros/th_sortable.html.twig" as macros %}
+                            <th>{{macros.th_sortable('id', 'ID',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>Заказчик</th>
+                            <th>Проект</th>
+                            <th>{{macros.th_sortable('section', 'Вид работ',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>{{macros.th_sortable('cost','Стоимость, план',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>{{macros.th_sortable('startDate','Дата начала',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>{{macros.th_sortable('factEndDate','Факт завершения',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>{{macros.th_sortable('UserIsp','Исполнитель',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'order_user')}}</th>
+                            <th>Стоимость, факт</th>
+                        <th width = "130px">Операции</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stageOrder in stageOrders %}
+                    <tr>
+                        {#<td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{stageOrder.id}}"/></td>#}
+                        {#<td><a href="{{ path('stageorder_edit', { 'id': stageOrder[0].id }) }}">{{ stageOrder[0].Id }}</a></td>#}
+                        <td>{{ stageOrder[0].Id }}</td>
+                        <td>{{ stageOrder[0].Customer }}</td>
+                        <td>{{ stageOrder[0].project }}</td>
+                        <td>{{ stageOrder[0].section }}</td>
+                        <td>{{ stageOrder[0].cost }}</td>
+                        <td>{%- if stageOrder[0].startDate %}{{ stageOrder[0].startDate|date('d.m.Y') }}{% endif %}</td>
+                        <td>{%- if stageOrder[0].factEndDate %}{{ stageOrder[0].factEndDate|date('d.m.Y') }}{% endif %}</td>
+                        <td>{%- if stageOrder[0].UserId %}{{ stageOrder[0].UserIsp }}{% endif %}</td>
+                        <td>{{ stageOrder.factPay }}</td>
+    
+                        <td class="actions">
+                            {#<a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('stageorder_by_id_delete', { 'id': stageOrder.id}) }}">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </a>#}
+                            {#<a title='Show' class="btn btn-info btn-sm" href="{{ path('stageorder_show', { 'id': stageOrder.id }) }}">
+                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                            </a>
+                            <a  title='Edit' class="btn btn-primary btn-sm" href="{{ path('stageorder_edit', { 'id': stageOrder.id }) }}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>#}
+                            
+                            {# Подача предложений #}
+                            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                {% if (app.user.id == stageOrder[0].UserId) and (app.user.id == stageOrder.gipId)  %} 
+                            <span data-toggle="tooltip" data-placement="top" title="Редактировать">        
+                            <a  title='Edit' class="btn btn-primary btn-xs" href="{{ path('stageorder_edit', { 'id': stageOrder[0].id }) }}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>        
+                            </span>        
+                                {% endif %}    
+                            {#    {% if not (app.user.id == stageOrder[0].UserId) and not stageOrder[0].factEndDate  %}    
+                            <span data-toggle="tooltip" data-placement="top" title="Подать предложение">
+                                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#add_offer_{{ stageOrder[0].Id }}">
+                                  <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                                </button>
+                            </span>  
+                                {% endif %} 
+                            {% else %}
+                            <span data-toggle="tooltip" data-placement="top" title="Подать предложение">
+                              <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#GuestModal">
+                                <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                              </button>
+                            </span>    #}
+                            {% endif %}    
+                            {# Просмотр списка предложений #}
+                            {% if stageOrder[0].offers|length == 0 %}
+                            <span data-toggle="tooltip" data-placement="top" title="Смотреть список предложений">
+                              <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#NoOffersModal">
+                                <i class="fa fa-signing" aria-hidden="true"></i>
+                              </button>
+                            </span>
+                            {% else %}
+                            <span data-toggle="tooltip" data-placement="top" title="Смотреть список предложений">
+                              <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#OffersModal{{ stageOrder[0].Id }}">
+                                <i class="fa fa-signing" aria-hidden="true"></i>
+                              </button>
+                            </span>
+                            
+                            <!-- Modal -->
+                            <div class="modal fade" id="OffersModal{{ stageOrder[0].Id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Список предложений для работы ID:{{ stageOrder[0].Id }}</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                      <table class="table table-condensed" {#style="background-color: wheat"#}>
+                                        <thead>
+                                            <tr>
+                                                <th>ID предл.</th>
+                                                {% if stageOrder[0].isLegalEntity %} 
+                                                    <th>ID под-ка</th>
+                                                {% else %}    
+                                                    <th>ID испол.</th>
+                                                {% endif %}        
+                                                <th>Стоимость, руб.</th>
+                                                <th>Срок, нед.</th>
+                                                <th>Информация</th>
+                                                <th>Выбор</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for offer in stageOrder[0].offers %}
+                                            <tr>
+                                            <td>{{ offer.id }}</td>    
+                                            {% if stageOrder[0].isLegalEntity %} 
+                                                <td>{{ offer.legalId }}</td>
+                                            {% else %}    
+                                                <td>{{ offer.userId }}</td>
+                                            {% endif %}
+                                            <td>{{ offer.cost }}</td>
+                                            <td>{{ offer.period }}</td>
+                                            <td>{{ offer.info }}</td>
+                                            <td>{% if offer.id == stageOrder[0].offerId %} <i class="fa fa-check" ></i> {% endif %}</td>
+                                            </tr>
+                                            {% endfor %}    
+                                        </tbody>    
+                                    </table>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            
+                            {% endif %}
+                            {# Просмотр задания #}
+                            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                            <span data-toggle="tooltip" data-placement="top" title="Посмотреть задание">
+                              <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#InfoModal{{ stageOrder[0].Id }}">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                              </button>
+                            </span>
+                            
+                            <!-- Modal -->
+                            <div class="modal fade" id="InfoModal{{ stageOrder[0].Id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Информация о работе</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                      <div class="row">
+                                          <div class="md-12">
+                                              <div class="form-group">
+                                                <span>
+                                                  <label class="col-xs-4 control-label">Вид работы</label>
+                                                </span>
+                                                <div class="col-xs-8">
+                                                      {{ stageOrder[0].section }}
+                                                </div>
+                                              </div><hr>
+                                              <div class="form-group">
+                                                <span>
+                                                  <label class="col-xs-4 control-label">Плановая стоимость</label>
+                                                </span>
+                                                <div class="col-xs-8">
+                                                      {{ stageOrder[0].cost }}
+                                                </div>
+                                              </div> <hr>    
+                                              <div class="form-group">
+                                                <span>
+                                                  <label class="col-xs-4 control-label">Дата начала</label>
+                                                </span>
+                                                <div class="col-xs-8">
+                                                      {%- if stageOrder[0].startDate %}{{ stageOrder[0].startDate|date('d.m.Y') }}{% endif %}
+                                              </div> <hr>   
+                                              <div class="form-group">
+                                                <span>
+                                                  <label class="col-xs-4 control-label">Информация</label>
+                                                </span>
+                                                <div class="col-xs-8">
+                                                      {{ stageOrder[0].info }}
+                                                </div>
+                                              </div>    
+                                          </div>
+                                          
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                    {#<a href="#" class="btn btn-primary">Подать предложение</a>#}
+                                    
+                                  </div>
+                                </div>
+                              </div>
+                            </div>    
+                                
+                            {% else %}
+                            <span data-toggle="tooltip" data-placement="top" title="Посмотреть задание">
+                              <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#GuestModal">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                              </button>
+                            </span>    
+                            {% endif %}
+                        </td>
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+
+        </div>
+</div> <!-- /#list -->
+
+
+
+{#
+<div class="row">
+        <div class="col-md-4 pull-left">
+            <div class="pagination form-inline ">
+                <select class = "form-control" name="bulk_action" >
+                    <option value="delete">DELETE</option>
+                </select>
+                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+            </div>
+        </div>
+#}
+<div class="col-md-6 col-md-offset-2 text-right">
+     {{ pagerHtml|raw }} 
+</div>
+</div> <!-- /#bottom -->
+
+
+
+{% endblock %}
+

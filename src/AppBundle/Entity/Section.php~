@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Section
@@ -43,7 +44,7 @@ class Section
     
      /**
      * Many Sections have Many Users.
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="sections")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\User", mappedBy="sections")
      */
     private $users;
     
@@ -139,8 +140,8 @@ class Section
      */
     public function __construct()
     {
-        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->orders = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
 
     /**

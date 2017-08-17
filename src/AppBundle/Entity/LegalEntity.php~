@@ -89,7 +89,6 @@ class LegalEntity
     
     public function __construct()
     {
-        parent::__construct();
         $this->contractprojects = new ArrayCollection();
         $this->contractorders = new ArrayCollection();
         $this->customprojects = new ArrayCollection();
@@ -369,5 +368,10 @@ class LegalEntity
     public function getContractorders()
     {
         return $this->contractorders;
+    }
+    
+    public function __toString() 
+    {
+        return $this->getName();
     }
 }

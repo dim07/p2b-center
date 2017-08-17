@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * portfolio
@@ -44,17 +45,56 @@ class portfolio
     /**
      * @var int
      *
-     * @ORM\Column(name="id_section", type="integer")
+     * @ORM\Column(name="id_section", type="integer", nullable=true)
      */
     private $idSection;
     
     /**
-     * @ORM\OneToOne(targetEntity="Section")
+     * @ORM\ManyToOne(targetEntity="Section")
      * @ORM\JoinColumn(name="id_section", referencedColumnName="id")
      */
     private $section;
-
+    
     /**
+     * @var int
+     *
+     * @ORM\Column(name="sectorId", type="integer", nullable=true)
+     */
+    private $sectorId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="Sector")
+     * @ORM\JoinColumn(name="sectorId", referencedColumnName="id")
+     */
+    private $sector;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="objectId", type="integer", nullable=true)
+     */
+    private $objectId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="SectorObject")
+     * @ORM\JoinColumn(name="objectId", referencedColumnName="id")
+     */
+    private $object;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="subobjectId", type="integer", nullable=true)
+     */
+    private $subobjectId;
+    
+    /**
+     * @ORM\ManyToOne(targetEntity="SubObject")
+     * @ORM\JoinColumn(name="subobjectId", referencedColumnName="id")
+     */
+    private $subobject;
+    
+   /**
      * @var \DateTime
      *
      * @ORM\Column(name="WorkDate", type="date", nullable=true)
@@ -69,7 +109,7 @@ class portfolio
     private $info;
     
     /**
-     * @ORM\OneToMany(targetEntity="UserFile", mappedBy="folio")
+     * @ORM\OneToMany(targetEntity="UserFile", mappedBy="folio", cascade={"persist", "remove"})
      */
     private $files;
 
@@ -291,4 +331,149 @@ class portfolio
     {
         return $this->section;
     }
+
+    /**
+     * Set sectorId
+     *
+     * @param integer $sectorId
+     *
+     * @return portfolio
+     */
+    public function setSectorId($sectorId)
+    {
+        $this->sectorId = $sectorId;
+
+        return $this;
+    }
+
+    /**
+     * Get sectorId
+     *
+     * @return integer
+     */
+    public function getSectorId()
+    {
+        return $this->sectorId;
+    }
+
+    /**
+     * Set objectId
+     *
+     * @param integer $objectId
+     *
+     * @return portfolio
+     */
+    public function setObjectId($objectId)
+    {
+        $this->objectId = $objectId;
+
+        return $this;
+    }
+
+    /**
+     * Get objectId
+     *
+     * @return integer
+     */
+    public function getObjectId()
+    {
+        return $this->objectId;
+    }
+
+    /**
+     * Set subobjectId
+     *
+     * @param integer $subobjectId
+     *
+     * @return portfolio
+     */
+    public function setSubobjectId($subobjectId)
+    {
+        $this->subobjectId = $subobjectId;
+
+        return $this;
+    }
+
+    /**
+     * Get subobjectId
+     *
+     * @return integer
+     */
+    public function getSubobjectId()
+    {
+        return $this->subobjectId;
+    }
+
+    /**
+     * Set sector
+     *
+     * @param \AppBundle\Entity\Sector $sector
+     *
+     * @return portfolio
+     */
+    public function setSector(\AppBundle\Entity\Sector $sector = null)
+    {
+        $this->sector = $sector;
+
+        return $this;
+    }
+
+    /**
+     * Get sector
+     *
+     * @return \AppBundle\Entity\Sector
+     */
+    public function getSector()
+    {
+        return $this->sector;
+    }
+
+    /**
+     * Set object
+     *
+     * @param \AppBundle\Entity\SectorObject $object
+     *
+     * @return portfolio
+     */
+    public function setObject(\AppBundle\Entity\SectorObject $object = null)
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * Get object
+     *
+     * @return \AppBundle\Entity\SectorObject
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * Set subobject
+     *
+     * @param \AppBundle\Entity\SubObject $subobject
+     *
+     * @return portfolio
+     */
+    public function setSubobject(\AppBundle\Entity\SubObject $subobject = null)
+    {
+        $this->subobject = $subobject;
+
+        return $this;
+    }
+
+    /**
+     * Get subobject
+     *
+     * @return \AppBundle\Entity\SubObject
+     */
+    public function getSubobject()
+    {
+        return $this->subobject;
+    }
+    
 }

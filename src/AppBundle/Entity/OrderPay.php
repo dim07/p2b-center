@@ -37,7 +37,7 @@ class OrderPay
     /**
      * @var float
      *
-     * @ORM\Column(name="PlanPay", type="float")
+     * @ORM\Column(name="PlanPay", type="float", nullable=true)
      */
     private $planPay;
 
@@ -51,7 +51,7 @@ class OrderPay
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="ChargDate", type="date")
+     * @ORM\Column(name="ChargDate", type="date", nullable=true)
      */
     private $chargDate;
 
@@ -149,7 +149,7 @@ class OrderPay
      */
     public function getFactPay()
     {
-        return $this->factPay;
+        return ($this->factPay ? $this->factPay : 0);
     }
 
     /**

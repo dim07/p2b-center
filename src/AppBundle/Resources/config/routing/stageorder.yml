@@ -22,6 +22,14 @@ stageorder_create:
 stageorder_edit:
     path:  /{id}/edit
     defaults: { _controller: "AppBundle:StageOrder:edit" }
+    
+stageorder_choose_offer:
+    path:  /{id}/chooseoffer/{offer_id}
+    defaults: { _controller: "AppBundle:StageOrder:chooseOffer" }  
+    requirements:
+        _method:  POST
+        id: \d+
+        offer_id: \d+
 
 stageorder_update:
     path:  /{id}/update

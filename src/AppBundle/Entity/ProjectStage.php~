@@ -58,6 +58,14 @@ class ProjectStage
      * @Assert\DateTime()
      */
     private $endDate;
+    
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="FactEndDate", type="datetime", nullable=true)
+     * @Assert\DateTime()
+     */
+    private $FactEndDate;
 
     /**
      * @var float
@@ -75,7 +83,7 @@ class ProjectStage
     
      /**
      * @ORM\OneToMany(targetEntity="StageOrder", mappedBy="stage")
-     * @ORM\OrderBy({"startDate" = "ASC"})
+     * @ORM\OrderBy({"isLegalEntity" = "DESC"})
      */
     private $orders;
     
@@ -191,6 +199,30 @@ class ProjectStage
     {
         return $this->endDate;
     }
+    
+    /**
+     * Set FactEndDate
+     *
+     * @param \DateTime $FactEndDate
+     *
+     * @return ProjectStage
+     */
+    public function setFactEndDate($FactEndDate)
+    {
+        $this->FactEndDate = $FactEndDate;
+
+        return $this;
+    }
+
+    /**
+     * Get FactEndDate
+     *
+     * @return \DateTime
+     */
+    public function getFactEndDate()
+    {
+        return $this->FactEndDate;
+    }
 
     /**
      * Set cost
@@ -213,7 +245,7 @@ class ProjectStage
      */
     public function getCost()
     {
-        return $this->cost;
+        return ($this->cost ? $this->cost : 0);
     }
 
     /**
@@ -296,5 +328,75 @@ class ProjectStage
     public function getOrders()
     {
         return $this->orders;
+    }
+    
+    public function __toString() 
+    {
+        return $this->getName();
+    }
+    
+    private $datas;
+    public function getDatas()
+    {
+        return $this->datas;
+    }
+    
+    public function setDatas($datas)
+    {
+        $this->datas = $datas;
+        return $this;
+    }
+    
+    public function getSubCost()
+    {
+        $cost0 = 0;
+        foreach ($this->orders as $order) {
+            if ($order->getIsLegalEntity()) {
+                $cost0 += $order->getCost();
+            }    
+        }
+        return $cost0;
+    }
+    
+    public function getSubFactCost()
+    {
+        $cost0 = 0;
+        foreach ($this->orders as $order) {
+            if ($order->getIsLegalEntity()) {
+                foreach ($order->getPays() as $pay) {
+                    if ($pay->getChargDate() and $pay->getFactPay()) {
+                        $cost0 += $pay->getFactPay();
+                    }    
+                }
+            }    
+        }
+        return $cost0;
+    }
+    
+    public function getIspCost()
+    {
+        $cost0 = 0;
+//        foreach ($this->orders as $order) {
+//            if (!($order->getIsLegalEntity()==1)) {
+//                $cost0 += $order->getCost();
+//            }    
+//        }
+        foreach ($this->orders as $order) {
+            if (!$order->getIsLegalEntity()) {
+                $cost0 += $order->getCost();
+            }    
+        }
+        
+        
+        return $cost0;
+    }
+    
+    public function getIspPays()
+    {
+        $cost0 = 0;
+        foreach ($this->orders as $order) {
+                $cost0 += $order->getIspPays();
+            }    
+        return $cost0;
     }
 }

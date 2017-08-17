@@ -19,14 +19,14 @@ class StageOrderEventFilterType extends AbstractType
             ->add('idEventType', Filters\NumberFilterType::class)
             ->add('eventDate', Filters\DateTimeFilterType::class)
             ->add('info', Filters\TextFilterType::class)
-            ->add('idFile', Filters\NumberFilterType::class)
+            ->add('File', Filters\TextFilterType::class)
         
             ->add('order', Filters\EntityFilterType::class, array(
                     'class' => 'AppBundle\Entity\StageOrder',
                     'choice_label' => 'id',
             )) 
-            ->add('File', Filters\EntityFilterType::class, array(
-                    'class' => 'AppBundle\Entity\UserFile',
+            ->add('EventType', Filters\EntityFilterType::class, array(
+                    'class' => 'AppBundle\Entity\EventType',
                     'choice_label' => 'name',
             )) 
         ;

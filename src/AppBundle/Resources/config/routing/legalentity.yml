@@ -5,6 +5,18 @@ legalentity:
 legalentity_show:
     path:  /{id}/show
     defaults: { _controller: "AppBundle:LegalEntity:show" }
+    
+legalentity_report_pays:  
+    path:  /{id}/report1
+    defaults: { _controller: "AppBundle:LegalEntity:reportPays" }
+    
+legalentity_confirm_pays:  
+    path:  /{id}/confirm-pays
+    defaults: { _controller: "AppBundle:LegalEntity:confirmPays" }    
+
+legalentity_confirm_fact_pays:  
+    path:  /{id}/confirm-pay-dates
+    defaults: { _controller: "AppBundle:LegalEntity:confirmFactPays" }    
 
 legalentity_new:
     path:  /new

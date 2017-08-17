@@ -49,11 +49,9 @@ class UserFile
     private $name;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="UserFileName", type="string", length=255)
-     */
-    private $userFileName;
+    * @ORM\Column(name="file",type="string", length=255, nullable=true)
+    */
+    private $File;
 
     /**
      * @var bool

@@ -1,6 +1,10 @@
 {% extends 'myforms.html.twig' %}
 
 {% set stages = project.stages %}
+{% set IsContractor = (app.user.id == project.ContractorId) %}
+{% set IsCustomer = (app.user.id == project.CustomerId) %}
+{% set IsGip = (app.user.id == project.gipId) %}
+{% set IsEditor = is_granted('ROLE_ADMIN') or IsContractor or IsCustomer %}
 
 {% block title %}
 {{ parent() }} -  Редактировать проект
@@ -16,7 +20,7 @@
 
 <div id="top" class="row">
     <div class="page-header">
-        <h2 class="text-center">Изменить данные проекта <span class="fa fa-edit " aria-hidden="true"></span></h2>
+        <h2 class="text-center">Данные проекта <span class="fa fa-edit " aria-hidden="true"></span></h2>
     </div>
 </div>
 <div class="row"> 
@@ -28,14 +32,14 @@
 
     {% include "project/_form.html.twig"   with {'form': edit_form} %}
 
-               
+    {% if IsEditor %}           
     <div class="row text-center">
-        <button type="submit" class="btn btn-primary">
+        <button {% if IsEditor %}type="submit"{% endif %} class="btn btn-primary {% if not IsEditor %} disabled {% endif %}">
             <span class="fa  fa-save" aria-hidden="true"></span> Сохранить
         </button>
     </div>
     <br>
-    
+    {% endif %}
     {{ form_end(edit_form) }}
     
             
@@ -53,7 +57,7 @@
                     <div class="row">
                         <div class="col-md-4">{{ form_row(new_stage_form.num) }}</div>
                         <div class="col-md-4">{{ form_row(new_stage_form.cost) }}</div>
-                        <div class="col-md-4">{{ form_row(new_stage_form.endDate) }}</div>
+                        <div class="col-md-4">{{ form_row(new_stage_form.endDate) }}{{ form_row(new_stage_form.FactEndDate) }}</div>
                     </div>    
                     {{ form_row(new_stage_form.info) }}
                 </div>
@@ -74,10 +78,12 @@
         <div class="panel panel-info">
             <div class="panel-heading">
                 <h3 class="panel-title">Структура проекта
+                    {% if IsEditor %}
                     <button class="btn btn-xs btn-primary pull-right" data-toggle="modal" data-target="#add_stage">
                         Добавить этап&nbsp;
                         <i class="fa fa-plus"></i>
                     </button>
+                    {% endif %}
                 </h3>    
             </div>
             <div class="panel-body">
@@ -86,7 +92,8 @@
                         <tr><th>&nbsp;</th>
                             <th>№</th>
                             <th>Наименование</th>
-                            <th>Дата завершения</th>
+                            <th>Дата завершения, план</th>
+                            <th>Дата завершения, факт</th>
                             <th>Стоимость руб. с НДС</th>
                             <th>Заказов</th>
                             <th>&nbsp;</th>
@@ -127,10 +134,11 @@
                             <td><button id="eye-{{ stage.id }}" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#stage-{{ stage.id }}"><i class="fa fa-eye"></i></button></td>
                             <td>{{ stage.num }}.</td>
                             <td>{{ stage.name }}</td>
-                            <td>{{ stage.endDate|date('d.m.Y') }}</td>
+                            <td>{{ stage.endDate ? stage.endDate|date('d.m.Y') }}</td>
+                            <td>{{ stage.FactEndDate ? stage.FactEndDate|date('d.m.Y') }}</td>
                             <td>{{ stage.cost }}</td>
                             <td><span class="badge">{{ stage.orders|length }}</span></td>
-                            <td><a href="{{ path('projectstage_edit', { 'id':  stage.id }) }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> </a></td>
+                            <td>{% if IsEditor %}<a href="{{ path('projectstage_edit', { 'id':  stage.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать этап"><i class="fa fa-pencil"></i> </a>{% endif %}</td>
                         </tr>
                         <tr>
                             <td colspan="12" class="hiddenRow">
@@ -139,20 +147,22 @@
                                     <div class="panel panel-info">
                                         <div class="panel-heading">
                                           <h3 class="panel-title">Список заказов для этапа №{{ stage.num }}
+                                              {% if IsEditor %}
                                                 <button class="btn btn-xs btn-primary pull-right" data-toggle="modal" data-target="#add_order_{{ stage.id }}">
                                                     Добавить заказ&nbsp;
                                                     <i class="fa fa-plus"></i>
                                                 </button>
+                                              {% endif %}      
                                           </h3>
                                         </div>
                                         <div class="panel-body">
                                             
-                                            <table class="table table-condensed">
+                                            <table class="table table-condensed" style="background-color: #b2d8ff">
                                                 <thead>
                                                     <tr>
                                                         <th>&nbsp;</th>
                                                         <th>ID</th>
-                                                        <th>Раздел</th>
+                                                        <th>Наименование</th>
                                                         <th>Стоимость, план, руб </th>
                                                         <th>Дата начала</th>
                                                         <th>Дата завершения, план</th>
@@ -163,7 +173,7 @@
                                                 </thead>
                                                 <tbody>
                                                     {% for order in orders %}
-                                                    <tr>
+                                                    <tr class="accordion-toggle">
                                                         <td><button id="eye-order-{{ order.id }}" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#order-{{ order.id }}"><i class="fa fa-eye"></i></button></td>
                                                         <td>{{ order.id }}</td>
                                                         <td>{{ order }}</td>
@@ -172,8 +182,129 @@
                                                         <td>{{ order.endDate ? order.endDate|date('d.m.Y') }}</td>
                                                         <td>{{ order.UserIsp ? order.UserIsp.fio }}</td>
                                                         <td>{{ order.Contractor ? order.Contractor }}</td>
-                                                        <td><a href="{{ path('stageorder_edit', { 'id':  order.id }) }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> </a></td>
+                                                        <td>{% if IsEditor or IsGip %}<a href="{{ path('stageorder_edit', { 'id':  order.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать заказ"><i class="fa fa-pencil"></i> </a>{% endif %}</td>
                                                     </tr>
+                                                    <tr>
+                                                        <td colspan="12" class="hiddenRow">
+                                                            <div class="accordian-body collapse" id="order-{{ order.id }}"> 
+                                                                {% set events = order.events %}
+                                                                {% set pays = order.pays %}
+                                                                {% set offers = order.offers %}
+                                                                <div>
+                                                                    <!-- Nav tabs -->
+                                                                    <ul class="nav nav-tabs" role="tablist">
+                                                                      <li role="presentation" class="active"><a href="#pays-{{ order.id }}" aria-controls="pays-{{ order.id }}" role="tab" data-toggle="tab">Выплаты</a></li>  
+                                                                      <li role="presentation"><a href="#predl-{{ order.id }}" aria-controls="predl-{{ order.id }}" role="tab" data-toggle="tab">Предложения</a></li>  
+                                                                      <li role="presentation"><a href="#events-{{ order.id }}" aria-controls="events-{{ order.id }}" role="tab" data-toggle="tab">События</a></li>
+                                                                      <li role="presentation"><a href="#tabel-{{ order.id }}" aria-controls="tabel-{{ order.id }}" role="tab" data-toggle="tab">Табель</a></li>
+                                                                    </ul>
+
+                                                                    <!-- Tab panes -->
+                                                                    <div class="tab-content">
+                                                                        <div role="tabpanel" class="tab-pane" id="events-{{ order.id }}">
+                                                                            <table class="table table-condensed" style="background-color: wheat">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>&nbsp;</th>
+                                                                                        {#<th>ID</th>#}
+                                                                                        <th>Дата</th>
+                                                                                        <th>Тип события</th>
+                                                                                        <th>Примечание</th>
+                                                                                        <th>Файл</th>
+                                                                                        <th>&nbsp;</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {% for ev in events %}
+                                                                                    <tr>
+                                                                                    <td></td>    
+                                                                                    {#<td>{{ ev.id }}</td>#}    
+                                                                                    <td>{{ ev.eventDate ? ev.eventDate|date('d.m.Y') }}</td>
+                                                                                    <td>{{ ev.EventType ? ev.EventType }}</td>
+                                                                                    <td>{{ ev.EventType ? ev.info }}</td>
+                                                                                    <td align="center">{% if ev.File|length > 0 %}<a href="{{ asset('uploads/docs/' ~ ev.File) }}" data-title="{{ ev.File }}" ><i class="fa fa-2x fa-{{ ev.File|icon }}"></i></a>{% endif %}</td>
+                                                                                    <td>{% if IsEditor  or IsGip %}<a href="{{ path('stageorderevent_edit', { 'id':  ev.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать событие"><i class="fa fa-pencil"></i> </a>{% endif %}</td>
+                                                                                    </tr>
+                                                                                    {% endfor %}    
+                                                                                </tbody>    
+                                                                            </table>
+                                                                        </div>
+                                                                        <div role="tabpanel" class="tab-pane active" id="pays-{{ order.id }}">
+                                                                            <table class="table table-condensed" style="background-color: wheat">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>&nbsp;</th>
+                                                                                        <th>ID</th>
+                                                                                        <th>Величина заявленная</th>
+                                                                                        <th>Величина утвержденная</th>
+                                                                                        <th>Дата выплаты</th>
+                                                                                        <th>Дата начисления</th>
+                                                                                        <th>Дата заявления на выплату</th>
+                                                                                        <th>&nbsp;</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {% for pay in pays %}
+                                                                                    <tr>
+                                                                                    <td></td>    
+                                                                                    <td>{{ pay.id }}</td>    
+                                                                                    <td>{{ pay.planPay ? pay.planPay }}</td>
+                                                                                    <td>{{ pay.factPay ? pay.factPay }}</td>
+                                                                                    <td>{{ pay.payDate ? pay.payDate|date('d.m.Y') }}</td>
+                                                                                    <td>{{ pay.factPay ? pay.chargDate|date('d.m.Y') }}</td>    
+                                                                                    <td>{{ pay.statementDate ? pay.statementDate|date('d.m.Y') }}</td>
+                                                                                    <td>{% if IsEditor %}<a href="{{ path('orderpay_edit', { 'id':  pay.id }) }}" class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="top" title="Редактировать выплату"><i class="fa fa-pencil"></i> </a>{% endif %}</td>
+                                                                                    </tr>
+                                                                                    {% endfor %}    
+                                                                                </tbody>    
+                                                                            </table>
+                                                                        </div>
+                                                                      <div role="tabpanel" class="tab-pane" id="tabel-{{ order.id }}">...</div>
+                                                                      <div role="tabpanel" class="tab-pane" id="predl-{{ order.id }}">
+                                                                          <table class="table table-condensed" style="background-color: wheat">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>&nbsp;</th>
+                                                                                    <th>ID</th>
+                                                                                    {% if order.isLegalEntity %} 
+                                                                                        <th>Субподрядчик</th>
+                                                                                    {% else %}    
+                                                                                        <th>Исполнитель</th>
+                                                                                    {% endif %}        
+                                                                                    <th>Стоимость, руб.</th>
+                                                                                    <th>Срок, нед.</th>
+                                                                                    <th>Информация</th>
+                                                                                    <th>Выбор</th>
+                                                                                    <th>&nbsp;</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {% for offer in offers %}
+                                                                                    
+                                                                                <tr>
+                                                                                <td></td>    
+                                                                                <td>{{ offer.id }}</td>    
+                                                                                {% if order.isLegalEntity %} 
+                                                                                    <td>{{ offer.legal }}</td>
+                                                                                {% else %}    
+                                                                                    <td>{{ offer.user }}</td>
+                                                                                {% endif %}
+                                                                                <td>{{ offer.cost }}</td>
+                                                                                <td>{{ offer.period }}</td>
+                                                                                <td>{{ offer.info }}</td>
+                                                                                <td>{% if offer.id == order.offerId %} <i class="fa fa-check" ></i> {% endif %}</td>
+                                                                                <td></td>
+                                                                                </tr>
+                                                                                {% endfor %}    
+                                                                            </tbody>    
+                                                                        </table>
+                                                                      </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                            </div>
+                                                        </td>
+                                                    </tr>    
                                                     {% endfor %}
                                                 </tbody>
                                             </table>
@@ -198,28 +329,50 @@
 
     
 <div class="form-group">
-    <a class="btn btn-default" href="{{ path('project') }}">
-        <span class="fa fa-list" aria-hidden="true"></span>
-        К списку проектов
-    </a>
-    <a class="btn btn-info" href="{{ path('project_new') }}">
-        <span class="fa fa-plus" aria-hidden="true"></span>
-        Новый
-    </a>
-    <form action="{{ path('project_delete', { 'id': project.id }) }}" method="post" style="display: inline-block">
-        <input type="hidden" name="_method" value="DELETE" />
-        {{ form_widget(delete_form) }}
-        <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить проект?');">
-            <span class="fa fa-remove" aria-hidden="true"></span>
-            Удалить проект
-        </button>
-    </form>
+    <div class="col-md-6">
+        <a class="btn btn-default" href="{{ path('project') }}">
+            <span class="fa fa-list" aria-hidden="true"></span>
+            К списку проектов
+        </a>
+        {% if is_granted('ROLE_ADMIN') %}    
+        <a class="btn btn-info" href="{{ path('project_new') }}">
+            <span class="fa fa-plus" aria-hidden="true"></span>
+            Новый
+        </a>
+        <form action="{{ path('project_delete', { 'id': project.id }) }}" method="post" style="display: inline-block">
+            <input type="hidden" name="_method" value="DELETE" />
+            {{ form_widget(delete_form) }}
+            <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены что хотите удалить проект?');">
+                <span class="fa fa-remove" aria-hidden="true"></span>
+                Удалить проект
+            </button>
+        </form>
+        {% endif %}  
+    </div>
+    <div class="col-md-6">
+        <a data-toggle="tooltip" title='Отчет доходы и расходы по проекту' class="btn btn-info" href="{{ path('project_report_money', { 'id': project.id }) }}">
+            <span class="fa fa-diamond" aria-hidden="true"></span>
+            Доходы и расходы
+        </a>
+        {% if project.GipId == app.user.id %}
+        <a  data-toggle="tooltip" title='Заявить выплаты по проекту' class="btn btn-success" href="{{ path('project_statements', { 'id': project.id }) }}">
+            <span class="fa fa-money" aria-hidden="true"></span>
+            Заявить выплаты
+        </a>    
+        {% endif %}    
+    </div>
 </div>
-
+{#{{ dump(dmp) }}#}
 {% endblock %}
 
 {% block javascripts %} 
     {{ parent() }}
+    <script>
+        $("#stage_order_section").change(function(){
+            var $name = $("#stage_order_name");
+            $name.val($("#stage_order_section option:selected").text());
+        }); 
+    </script>
    {# {% for stage in stages %}
         $('#stage-{{ stage.id }}').on('shown.bs.collapse', function () {
             $("#eye-{{ stage.id }} span.glyphicon").removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");

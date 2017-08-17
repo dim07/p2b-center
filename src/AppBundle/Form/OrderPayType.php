@@ -28,12 +28,12 @@ class OrderPayType extends AbstractType
                 'currency' => 'RUB',
                 'required' => false
             ))
-            ->add('chargDate', DateTimePickerType::class, [
+            ->add('payDate', DateTimePickerType::class, [
                 'label' => 'Дата выплаты',
                 'format' => 'dd.MM.yyyy',
                 'required' => false
             ])
-            ->add('payDate', DateTimePickerType::class, [
+            ->add('chargDate', DateTimePickerType::class, [
                 'label' => 'Дата начисления',
                 'format' => 'dd.MM.yyyy',
                 'required' => false

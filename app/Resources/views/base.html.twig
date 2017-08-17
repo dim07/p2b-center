@@ -1,6 +1,7 @@
-{% set site_name = 'P2B площадка' %}
+{% set site_name = 'P2B Center' %}
 {% set currenturl = path(app.request.attributes.get('_route'),
                            app.request.attributes.get('_route_params')) %}
+{% if page_name is not defined %} {% set page_name = '' %} {% endif %}                           
                           
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}">
@@ -14,6 +15,7 @@
             <link href='http://fonts.googleapis.com/css?family=Roboto:400,900&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
             <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
             <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     {% block style %}    
@@ -33,13 +35,18 @@
     {% endblock %}    
     </head>
     
-    {% block carousel %}
+   {% block carousel %}
         
-    {% endblock %}    
+    {% endblock %}     
     
     <body>
         <!-- Part 1: Wrap all page content here -->
+        
+        
+        
     <div id="wrap" class="bg-0">
+        
+        
 
         {% block header %}
             {% include '_page_header.twig' with {'page_name': page_name} %}
@@ -53,6 +60,8 @@
          </div>
 
         {% set ttl = site_name %}    
+        
+                    
         {#<div class="affix-panel">
             <ul class="nav nav-stacked main-nav-list">
                 <li>
@@ -76,12 +85,37 @@
                         <li class="text-right"><a href="#" id="nav-close"><i class="fa fa-times-circle-o fa-lg" aria-hidden="true"></i></a></li>
                 </ul>
                    
-
+                <ul class="hidden-lg nav nav-pills nav-stacked side-pills">
+                    <li {% if page_name == 'orders_p' %} class="active" {% endif %} role="presentation pills-item">
+                        <a href="{{ path('order_pers') }}">
+                            <h5><i class="fa fa-cog fa-lg"></i> Работы персоналу</h5>
+                        </a>
+                    </li>
+                    {#
+                    <li {% if page_name == 'orders_s' %} class="active" {% endif %}><a class="stroke" href="{{ path('order_sub') }}"><strong><span class="fa fa-cogs fa-lg"></span> Работы на субподряд</strong></a></li>
+                    #}
+                    <li {% if page_name == 'experts' %} class="active" {% endif %} role="presentation pills-item">
+                        <a href="{{ path('experts') }}">
+                            <h5><i class="fa fa-user-circle-o fa-lg"></i> Персонал</h5>
+                        </a>
+                    </li>    
+                    <li {% if page_name == 'contractors' %} class="active" {% endif %} role="presentation pills-item">
+                        <a href="{{ path('subcontractors') }}">
+                            <h5><i class="fa fa-users fa-lg"></i> Подрядчики</h5>
+                        </a>
+                    </li>
+                    <li {% if page_name == 'base' %} class="active" {% endif %} role="presentation pills-item">
+                        <a href="{{ path('portfolio') }}">
+                            <h5><i class="fa fa-database fa-lg"></i> База решений</h5>
+                        </a>
+                    </li>
+                </ul>    
+            
                 <ul class="nav nav-pills nav-stacked side-pills">
                     {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         <li role="presentation pills-item" class="dropdown" id="accordion">
                             <a aria-controls="collapseCtg" aria-expanded="true" data-parent="#accordion" data-toggle="collapse"
-                            href="##collapseCtg">
+                            href="#collapseCtg">
                                  <span class="fa fa-user fa-lg" aria-hidden="true"> {{app.user.username}}</span>
                                  <span class="fa fa-caret-down"></span>
                              </a>
@@ -92,38 +126,49 @@
                                          <h5><i class="fa fa-chevron-left"></i> Профиль <span class="badge pull-right"></span></h5>
                                      </a>
                                  </li>
-                                 <li>
+                                 {#<li>
                                      <a href="{{ path('fos_user_change_password') }}">
                                          <h5><i class="fa fa-chevron-left"></i> Сменить пароль <span class="badge pull-right"></span></h5>
                                      </a>
-                                 </li>
+                                 </li>#}
                                  <li>
                                      <a href="{{ path('fos_user_security_logout') }}">
                                          <h5><i class="fa fa-chevron-left"></i> Выход <span class="badge pull-right"></span></h5>
                                      </a>
                                  </li>        
                                  <li role="separator" class="divider"></li>
-                                 
+                                 {% if is_granted('ROLE_ADMIN') %}
+                                 <li {% if page_name == 'projects_all' %}class="active"{% endif %}>       
+                                    <a href="{{ path('allprojects') }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Все проекты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>
+                                 {% endif %}
                                  {% set  legentity = app.user.legentity %}
                                  {% if legentity %}
+                                 {#    
                                  <li>
                                      <a href="{{ path('legalentity_show', { 'id': legentity.id }) }}">
                                         <h5><i class="fa fa-chevron-left"></i> Юрлицо <span class="badge pull-right"></span></h5>
                                      </a>
-                                 </li>       
-                                    {% if legentity.customer %}   
-                                 <li>       
+                                 </li>  
+                                 #}
+                                 <li {% if page_name == 'projects_u' %}class="active"{% endif %}>       
                                     <a href="{{ path('project', { 'id': legentity.id }) }}">    
                                         <h5><i class="fa fa-chevron-left"></i> Наши проекты <span class="badge pull-right"></span></h5>
                                     </a>
-                                 </li>       
-                                 <li>       
+                                 </li>
+                                    {% if legentity.customer %}   
+                                        
+                                 <li {% if page_name == 'project_new' %}class="active"{% endif %}>       
                                     <a href="{{ path('project_new') }}">    
                                         <h5><i class="fa fa-chevron-left"></i> Новый проект <span class="badge pull-right"></span></h5>
                                     </a>
-                                 </li>       
+                                 </li>    
+
                                     {% endif %}  
-                                    {% if legentity.contractor %}   
+                                    {% if legentity.contractor %}  
+                                        {#
                                  <li>       
                                     <a href="{{ path('stageorder') }}">    
                                         <h5><i class="fa fa-chevron-left"></i> Наши работы <span class="badge pull-right"></span></h5>
@@ -134,31 +179,130 @@
                                         <h5><i class="fa fa-chevron-left"></i> Наши предложения <span class="badge pull-right"></span></h5>
                                     </a>    
                                  </li> 
+                                        #}
+                                 {#       
+                                 <li>       
+                                    <a href="{{ path('legalentity_report_pays', { 'id': legentity.id }) }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Начисления <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li> #}      
+                                 <li>
+                                    <a href="#"  data-toggle="modal" data-target="#ReportsModalLeg">    
+                                        <h5><i class="fa fa-chevron-left"></i> Отчеты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="ReportsModalLeg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Выберите нужный отчет</h4>
+                                          </div>
+                                          <div class="modal-body">
+                                              <div class="list-group">
+                                                <a href="{{ path('app_report_gip') }}" class="list-group-item list-group-item-info">
+                                                    <strong>Сводные отчеты ГИП</strong>
+                                                </a>  
+                                                <a href="{{ path('legalentity_report_pays', { 'id': legentity.id }) }}" class="list-group-item list-group-item-info">
+                                                    <strong>Сводка заявленной зарплаты</strong>
+                                                </a>
+                                                <a href="{{ path('legalentity_report_pays', { 'id': legentity.id, 'approved': 1 }) }}" class="list-group-item list-group-item-info">
+                                                    <strong>Сводка фактической зарплаты</strong>
+                                                </a>
+                                                <a href="{{ path('report_events') }}" class="list-group-item list-group-item-info">
+                                                    <strong>События</strong>
+                                                </a>   
+                                                <a href="{{ path('user_report_pays2') }}" class="list-group-item list-group-item-info"><strong>Выплаты</strong></a>    
+                                              </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div> 
+                                     
+                                 </li>  
+                                 
+                                 <li role="separator" class="divider"></li>
+                                 <li role="separator" class="divider text-center"><i class="fa fa-ruble fa-lg" aria-hidden="true"></i> ВЫПЛАТЫ</li>
+
+                                 <li {% if page_name == 'legalentity_confirm_pays' %}class="active"{% endif %}>       
+                                    <a href="{{ path('legalentity_confirm_pays', { 'id': legentity.id }) }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Утвердить <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>
+                                 <li {% if page_name == 'legalentity_confirm_paydates' %}class="active"{% endif %}>       
+                                    <a href="{{ path('legalentity_confirm_fact_pays', { 'id': legentity.id }) }}">    
+                                        <h5><i class="fa fa-chevron-left"></i> Подтвердить даты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>
+                                 
                                      {% endif %}
                                      
                                  {% else %}   
+                                     {#
                                  <li>
                                      <a href="{{ path('legalentity_new') }}">
                                          <h5><i class="fa fa-chevron-left"></i> Создать Юрлицо <span class="badge pull-right"></span></h5>
                                      </a>
                                  </li>    
-                                 {% endif %}    
-                                 <li role="separator" class="divider"></li>
-                                 <li>
-                                    <a href="{{ path('portfolio') }}">    
-                                           <h5><i class="fa fa-chevron-left"></i> Портфолио <span class="badge pull-right"></span></h5>
-                                   </a>
-                                 </li>
-                                 <li>
-                                    <a href="{{ path('stageorder') }}">    
+                                 <li role="separator" class="divider"></li> #}
+                                     {% set gip = (app.user.gipprojects | length > 0) %}
+                                     {% if gip %}
+                                 <li {% if page_name == 'projects_u' %}class="active"{% endif %}>
+                                    <a href="{{ path('project') }}">    
+                                           <h5><i class="fa fa-chevron-left"></i> Мои проекты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                 </li>        
+                                     {% endif %}
+                                 <li {% if page_name == 'orders_u' %}class="active"{% endif %}>
+                                    <a href="{{ path('order_user') }}">    
                                            <h5><i class="fa fa-chevron-left"></i> Мои работы <span class="badge pull-right"></span></h5>
                                    </a>
                                  </li>
                                  <li>
-                                   <a href="{{ path('stageorder') }}">    
-                                       <h5><i class="fa fa-chevron-left"></i> Мои предложения <span class="badge pull-right"></span></h5>
+                                    <a href="#"  data-toggle="modal" data-target="#ReportsModal">    
+                                        <h5><i class="fa fa-chevron-left"></i> Отчеты <span class="badge pull-right"></span></h5>
+                                    </a>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="ReportsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                      <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Выберите нужный отчет</h4>
+                                          </div>
+                                          <div class="modal-body">
+                                              <div class="list-group">
+                                                {% if gip %}
+                                                <a href="{{ path('user_report_gip', { 'id': app.user.id }) }}" class="list-group-item list-group-item-info"><strong>Сводный отчет ГИПа</strong></a>    
+                                                <a href="{{ path('report_events') }}" class="list-group-item list-group-item-info">
+                                                    <strong>События</strong>
+                                                </a> 
+                                                {% endif %}    
+                                                <a href="{{ path('user_report_pays', { 'id': app.user.id }) }}" class="list-group-item list-group-item-info"><strong>Выплаты</strong></a>
+                                                <a href="#" class="list-group-item list-group-item-info"><strong>Табель</strong></a>
+                                                <a href="#" class="list-group-item list-group-item-info"><strong>Участие в конкурсах</strong></a>
+                                              </div>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div> 
+                                     
+                                 </li>
+                                 <li {% if page_name == 'base_u' %}class="active"{% endif %}>
+                                    <a href="{{ path('portfolio_user') }}">    
+                                           <h5><i class="fa fa-chevron-left"></i> Мое портфолио <span class="badge pull-right"></span></h5>
                                    </a>
-                                </li>
+                                 </li>
+                                 {% endif %}    
+                                 
                              </ul>
                          </li>        
                                 
@@ -238,10 +382,11 @@
             <script src="{{ asset('js/moment.min.js') }}"></script>
             <script src="{{ asset('js/highlight.pack.js') }}"></script>
             <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
+            
             <script src="{{ asset('js/template.js') }}"></script>
             
             <script src="{{ asset('bundles/petkoparacrudgenerator/js/petkopara-crud-generator.js') }}"></script>
-
+            
         {% endblock %}
 
     </body>

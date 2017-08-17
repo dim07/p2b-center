@@ -1,61 +1,53 @@
-{% extends 'base.html.twig' %}
+
+{% extends 'myforms.html.twig' %}
 
 {% block title %}
-{{ parent() }} -  Edit portfolio
+{{ parent() }} -  Редактировать работу в портфолио
 {% endblock %}
 
 {% block body %}
 
-<div id="top" class="row">
+<div id="top" class="row text-center">
     <div class="page-header">
-        <h2>Edit portfolio <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></h2>
+        <h2>Редактировать работу в портфолио <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></h2>
+        <h4>{{ userFio }}</h4>
     </div>
 </div>
 
-
-
-<div class="row">
-    <div class="row">
-    <div class="col-md-12">
-        {% for type, flashMessages in app.session.flashbag.all() %} 
-        {% for flashMessage in flashMessages %}
-        <div class="alert alert-{{ type }}">
-            {{ flashMessage|raw }}
-        </div>
-         {% endfor %} 
-         {% endfor %} 
-    </div>
-</div>
     
-
+<div class="row">
     {{ form_start(edit_form) }}
 
-    {{ form_widget(edit_form) }}
-    <p>
-        <button type="submit" class="btn btn-primary">
-            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit
+    {% include "portfolio/_form.html.twig"   with {'form': edit_form} %}
+    <div class="col-md-12 text-right">
+        <button type="submit" name="submit" value="save" class="btn btn-lg btn-primary"> 
+            Сохранить <span class="fa  fa-save" aria-hidden="true"></span>
         </button>
-    </p>
+    </div>
     {{ form_end(edit_form) }}
-
+</div>
     <hr/>
 
     
 <div class="form-group">
-    <a class="btn btn-default" href="{{ path('portfolio') }}">
+    <a class="btn btn-default" href="{{ path('portfolio_user') }}">
         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-        Back to list
+        Вернуться в портфолио
     </a>
+    <a class="btn btn-primary" href="{{ path('portfolio_show', { 'id':  portfolio.id }) }}">
+        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+        Просмотр
+    </a>    
     <a class="btn btn-info" href="{{ path('portfolio_new') }}">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-        New
+        Добавить новую работу
     </a>
     <form action="{{ path('portfolio_delete', { 'id': portfolio.id }) }}" method="post" style="display: inline-block">
         <input type="hidden" name="_method" value="DELETE" />
         {{ form_widget(delete_form) }}
         <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            Delete
+            Удалить
         </button>
     </form>
 </div>
@@ -65,3 +57,104 @@
 
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        var $object = $('#portfolio_object');
+        $(function(){
+            $object.change(function(){
+                // ... retrieve the corresponding form.
+                var $form = $(this).closest('form');
+                // Simulate form data, but only include the selected sport value.
+                var data = {};
+                data[$object.attr('name')] = $object.val();
+
+                $.ajax({
+                    type: $form.attr('method'),
+                    url: $form.attr('action'),
+                    data: data,
+                    success: function(html) {
+                        // Replace current position field ...
+                        $("#portfolio_subobject").replaceWith(
+                          // ... with the returned one from the AJAX response.
+                          $(html).find('#portfolio_subobject')
+                        );
+                        // Position field now displays the appropriate positions.
+                    }
+                });
+               
+                
+            });
+        });
+        
+        function addTagFormDeleteLink($tagFormLi) {
+            var $removeFormA = $('<div class="col-md-12"><a class="btn btn-sm btn-danger" href="#"><i class="fa fa-remove"></i> Удалить</a></div>');
+            $tagFormLi.append($removeFormA);
+            $removeFormA.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // remove the li for the tag form
+                $tagFormLi.remove();
+            });
+        }
+        
+        function addTagForm($collectionHolder, $newLinkLi) {
+            // Get the data-prototype explained earlier
+            var prototype = $collectionHolder.data('prototype');
+
+            // get the new index
+            var index = $collectionHolder.data('index');
+
+            // Replace '__name__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            var newForm = prototype.replace(/__name__/g, index);
+
+            // increase the index with one for the next item
+            $collectionHolder.data('index', index + 1);
+
+            // Display the form in the page in an li, before the "Add a tag" link li
+            var $newFormLi = $('<div class="file col-md-4"></div>').append(newForm);
+            $newLinkLi.before($newFormLi);
+            
+            // add a delete link to the new form
+            addTagFormDeleteLink($newFormLi);
+        }
+        
+        var $collectionHolder;
+
+        // setup an "add a tag" link
+        var $addTagLink = $('<br><a class="add_file_link btn btn-sm btn-success" href="#"><i class="fa fa-plus"></i> Добавить файл</a>');
+        var $newLinkLi = $('<div class="col-md-12 text-center"></div>').append($addTagLink);
+
+        jQuery(document).ready(function() {
+            //$('.jb_fileupload').jbFileUpload();
+            // Get the ul that holds the collection of tags
+            $collectionHolder = $('div.files');
+            //$head = $('h3.files-l'); 
+            // add the "add a tag" anchor and li to the tags ul
+            $collectionHolder.append($newLinkLi);
+            //$head.append($newLinkLi);
+            // add a delete link to all of the existing tag form li elements
+            $collectionHolder.find('.file').each(function() {
+                addTagFormDeleteLink($(this));
+            });
+
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+            $addTagLink.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // add a new tag form (see next code block)
+                addTagForm($collectionHolder, $newLinkLi);
+                $('.jb_fileupload').jbFileUpload();
+            });
+        });
+        
+    </script>
+    
+{% endblock %}

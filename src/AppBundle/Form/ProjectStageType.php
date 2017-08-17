@@ -29,7 +29,12 @@ class ProjectStageType extends AbstractType
                 'required' => false
             )) 
             ->add('endDate', DateTimePickerType::class, [
-                'label' => 'Дата завершения',
+                'label' => 'Дата завершения, план',
+                'format' => 'dd.MM.yyyy',
+                'required' => false
+            ])    
+            ->add('FactEndDate', DateTimePickerType::class, [
+                'label' => 'Дата завершения, факт',
                 'format' => 'dd.MM.yyyy',
                 'required' => false
             ])    

@@ -2,7 +2,8 @@
 {% set col2 = 7 %}
 {% set site_logo = asset('logodw.png') %}
 
-{% set site_slogan = 'Сделаем работу вместе!' %}
+{% set site_slogan = 'Люди для дела, дела для людей' %}
+
 
 <header class="header fixed clearfix navbar navbar-fixed-top">
     <div class="container-fluid">
@@ -59,11 +60,15 @@
                                 <!-- Collect the nav links, forms, and other content for toggling -->
                                 <div class="navbar-collapse {#scrollspy smooth-scroll hidden-xs hidden-sm#}" id="navbar-collapse-1">
                                     <ul class="nav navbar-nav navbar-left">
-                                        <li {% if page_name == 'home' %} class="active" {% endif %}><a class="stroke" href="{{ path('homepage') }}"><strong><span class="fa fa-home fa-lg"></span> Главная</strong></a></li>
+                                        {#<li {% if page_name == 'home' %} class="active" {% endif %}><a class="stroke" href="{{ path('homepage') }}"><strong><span class="fa fa-home fa-lg"></span></strong></a></li>#}
                                         {#<li><a class="stroke" href="{{ path('stageorder') }}"><strong><span class="fa fa-handshake-o fa-lg"></span> Заказы</strong></a></li>#}
-                                        <li {% if page_name == 'orders' %} class="active" {% endif %}><a class="stroke" href="{{ path('stageorder') }}"><strong><span class="fa fa-handshake-o fa-lg"></span> Заказы</strong></a></li>
-                                        <li {% if page_name == 'experts' %} class="active" {% endif %}><a class="stroke" href="{{ path('experts') }}"><strong><span class="fa fa-user-circle-o fa-lg"></span> Исполнители</strong></a></li>    
+                                        <li {% if page_name == 'orders_p' %} class="active" {% endif %}><a class="stroke" href="{{ path('order_pers') }}"><strong><span class="fa fa-cog fa-lg"></span> Работы персоналу</strong></a></li>
+                                        {#
+                                        <li {% if page_name == 'orders_s' %} class="active" {% endif %}><a class="stroke" href="{{ path('order_sub') }}"><strong><span class="fa fa-cogs fa-lg"></span> Работы на субподряд</strong></a></li>
+                                        #}
+                                        <li {% if page_name == 'experts' %} class="active" {% endif %}><a class="stroke" href="{{ path('experts') }}"><strong><span class="fa fa-user-circle-o fa-lg"></span> Персонал</strong></a></li>    
                                         <li {% if page_name == 'contractors' %} class="active" {% endif %}><a class="stroke" href="{{ path('subcontractors') }}"><strong><span class="fa fa-users fa-lg"></span> Подрядчики</strong></a></li>
+                                        <li {% if page_name == 'base' %} class="active" {% endif %}><a class="stroke" href="{{ path('portfolio') }}"><strong><span class="fa fa-database fa-lg"></span> База решений</strong></a></li>
                                         
                                     </ul>
                                 </div>

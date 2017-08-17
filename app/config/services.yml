@@ -7,6 +7,12 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    monthes:
+        class: AppBundle\Extensions\Monthes
+    
+    days:
+        class: AppBundle\Extensions\MonthDays    
+
     app.form.registration:
         class: AppBundle\Form\RegistrationType
         tags:
@@ -21,6 +27,24 @@ services:
         class: AppBundle\Form\Extension\ImageTypeExtension
         tags:
             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\FileType }
+            
+    app.twig_extension:
+        class: AppBundle\Twig\AppExtension
+        public: false
+        tags:
+            - { name: twig.extension }        
+            
+#    app.type.subobject_selector:
+#        class: AppBundle\Form\Type\SubObjectType
+#        arguments: ['@doctrine.orm.entity_manager']
+#        tags:
+#            - { name: form.type }        
+            
+#    app.form.project:
+#        class: AppBundle\Form\Type\projectType
+#        arguments: ['@security.token_storage']
+#        tags:
+#            - { name: form.type }            
 #
 #    pagerfanta.view.default:
 #        class: Pagerfanta\View\DefaultView

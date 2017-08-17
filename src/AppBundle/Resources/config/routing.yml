@@ -2,9 +2,39 @@ app_project:
     resource: "@AppBundle/Resources/config/routing/project.yml"
     prefix:   /project
     
+allprojects:
+    path:   /all-projects
+    defaults: { _controller: "AppBundle:project:indexAll" }
+    
+project_report_money_excel:
+    path:     /project_report_money{id}.{_format}
+    defaults: { _controller: AppBundle:project:reportMoneyExcel, _format: xlsx }
+    requirements: { _format: csv|xls|xlsx }    
+    
 experts:
     path:  /experts
     defaults: { _controller: "AppBundle:User:experts" } 
+    
+order_pers:
+    path:  /order-pers
+    defaults: { _controller: "AppBundle:StageOrder:order_pers" } 
+#    methods:  GET|POST
+
+report_events:
+    path:  /report-events
+    defaults: { _controller: "AppBundle:StageOrderEvent:report" } 
+
+report_project_events:
+    path:  /project-events
+    defaults: { _controller: "AppBundle:StageOrderEvent:reportProject" } 
+
+order_user:
+    path:  /order-user
+    defaults: { _controller: "AppBundle:StageOrder:order_user" }     
+    
+order_sub:
+    path:  /order-sub
+    defaults: { _controller: "AppBundle:StageOrder:order_sub" }     
     
 subcontractors:
     path:  /subcontractors
@@ -36,4 +66,24 @@ app_orderpay:
         
 app_stageorderevent:
         resource: "@AppBundle/Resources/config/routing/stageorderevent.yml"
-        prefix:   /stageorderevent        
+        prefix:   /stageorderevent     
+        
+app_offer:
+        resource: "@AppBundle/Resources/config/routing/offer.yml"
+        prefix:   /offer      
+        
+user_report_pays:  
+    path:  /{id}/report1
+    defaults: { _controller: "AppBundle:User:reportPays" }     
+
+user_report_pays2:  
+    path:  /report1f
+    defaults: { _controller: "AppBundle:User:reportPays2" }     
+    
+user_report_gip:  
+    path:  /{id}/report2
+    defaults: { _controller: "AppBundle:User:reportGip" }  
+    
+app_report_gip:  
+    path:  /report_gip
+    defaults: { _controller: "AppBundle:User:reportGipWithFilter" }      

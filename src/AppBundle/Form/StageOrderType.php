@@ -11,7 +11,7 @@ use AppBundle\Form\Type\DateTimePickerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Doctrine\ORM\EntityRepository;
 //use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-//use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 
 class StageOrderType extends AbstractType
 {
@@ -23,8 +23,12 @@ class StageOrderType extends AbstractType
     {
         $object = $builder->getData();
         $proj_id = $object->getStage()->getIdProject();
+        $order_id = $object->getId();
+        $user = $options['user'];
+        $project = $object->getStage()->getProject(); 
         
         $builder
+            ->add('name', null, array('label' => 'Наименование', 'required' => true,'disabled' => ($user and $user->getId()===$project->getGipId()),))    
             ->add('section', EntityType::class, array(
                 'class' => 'AppBundle\Entity\Section',
                 'choice_label' => 'name',
@@ -36,18 +40,20 @@ class StageOrderType extends AbstractType
                     'class'   => 'js-example-basic-single',
                     'style' => 'width: 100%'),
                 'empty_data' => null,
-                'required' => true
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
+                'required' => false,
  
             ))    
-//            ->add('cost', MoneyType::class, array('label' => 'Стоимость', 'currency' => 'RUB'))
+            ->add('cost', MoneyType::class, array('label' => 'Стоимость, план', 'currency' => 'RUB', 'required' => false,'disabled' => ($user and $user->getId()===$project->getGipId()),))
             ->add('startDate', DateTimePickerType::class, [
                 'label' => 'Дата начала заказа',
                 'format' => 'dd.MM.yyyy',
-                
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             ])
             ->add('factEndDate', DateTimePickerType::class, [
                 'label' => 'Дата завершения заказа',
                 'format' => 'dd.MM.yyyy',   
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
                 'required' => false
             ])    
                 
@@ -63,18 +69,19 @@ class StageOrderType extends AbstractType
                 },
                 'group_by' => 'stage',        
                 'label'    => 'Зависит от заказа',
-                'choice_label' => 'section',
+                'choice_label' => 'name',
                 'placeholder' => 'Сделайте выбор',
                 'empty_data' => null,
                 'attr'   =>  array(
                     'class'   => 'js-example-basic-single',
                     'style' => 'width: 100%'),
-                'required' => false
- 
+                'required' => false,
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             )) 
             ->add('isLegalEntity', CheckboxType::class, array(
-                'label'    => 'Подрядчик (ю.л.)',
+                'label'    => 'Субподрядчик (ю.л.)',
                 'required' => false,
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             ))    
             ->add('Contractor', EntityType::class, array(
                 'class' => 'AppBundle\Entity\LegalEntity',
@@ -90,8 +97,8 @@ class StageOrderType extends AbstractType
                 'attr'   =>  array(
                     'class'   => 'js-example-basic-single',
                     'style' => 'width: 100%'),
-                'required' => false
- 
+                'required' => false,
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             )) 
             ->add('UserIsp', EntityType::class, array(
                 'class' => 'AppBundle\Entity\User',
@@ -108,6 +115,7 @@ class StageOrderType extends AbstractType
                 'attr'   =>  array(
                     'class'   => 'js-example-basic-single',
                     'style' => 'width: 100%'),
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
                 'required' => false
  
             ))
@@ -115,6 +123,7 @@ class StageOrderType extends AbstractType
             ->add('isPublic', CheckboxType::class, array(
                 'label'    => 'Опубликовано',
                 'required' => false,
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             ))    
 //            ->add('endDate', DateTimePickerType::class, [
 //                'label' => 'Дата завершения заказа план',
@@ -127,8 +136,28 @@ class StageOrderType extends AbstractType
             ->add('info', TextareaType::class, array(
                 'label' => 'Примечание', 
                 'attr' => array('rows' => '4'),
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
                 'required' => false
                 ))
+                        
+//            ->add('offer', EntityType::class, array(
+//                'class' => 'AppBundle\Entity\Offer',
+//                'query_builder' => function (EntityRepository $er) use ($order_id) {
+//                
+//                    return $er->createQueryBuilder('o')
+//                        ->where('o.order_id = '.$order_id)    
+//                        ->orderBy('o.cost', 'ASC');
+//                },
+//                'label'    => 'Выбор предложения',
+////                'choice_label' => 'fio',
+//                'placeholder' => 'Сделайте выбор',
+//                'empty_data' => null,
+//                'attr'   =>  array(
+//                    'class'   => 'js-example-basic-single',
+//                    'style' => 'width: 100%'),
+//                'required' => false
+// 
+//            ))            
         ;
     }
     
@@ -140,5 +169,6 @@ class StageOrderType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'AppBundle\Entity\StageOrder'
         ));
+        $resolver->setRequired('user');
     }
 }

@@ -19,12 +19,18 @@ class AppKernel extends Kernel
             new JavierEguiluz\Bundle\EasyAdminBundle\EasyAdminBundle(),
             new FOS\UserBundle\FOSUserBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
-            new Liip\ImagineBundle\LiipImagineBundle(),
             new Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle(),
             new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
             new Petkopara\CrudGeneratorBundle\PetkoparaCrudGeneratorBundle(),
 //            new Genemu\Bundle\FormBundle\GenemuFormBundle(),
             new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+            
+            new Oneup\UploaderBundle\OneupUploaderBundle(),
+            new Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
+            new Liip\ImagineBundle\LiipImagineBundle(),
+            new Jb\Bundle\FileUploaderBundle\JbFileUploaderBundle(),
+            new Liuggio\ExcelBundle\LiuggioExcelBundle(),
+//            new MewesK\TwigExcelBundle\MewesKTwigExcelBundle(),
             
         ];
 

@@ -42,7 +42,7 @@ class User extends BaseUser
     protected $sections;
     
     /**
-     * @ORM\OneToMany(targetEntity="project", mappedBy="gip", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="project", mappedBy="gip")
      */
     private $gipprojects;
     
@@ -52,7 +52,7 @@ class User extends BaseUser
     private $orders;
     
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string
      */
     private $avatar;
@@ -67,7 +67,7 @@ class User extends BaseUser
     private $imageFile;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      * @var \DateTime
      */
     private $updatedAt;
@@ -94,7 +94,7 @@ class User extends BaseUser
     /**
      * @var bool
      *
-     * @ORM\Column(name="HideName", type="boolean")
+     * @ORM\Column(name="HideName", type="boolean", nullable=true)
      */
     private $hideName;
     
@@ -411,6 +411,18 @@ class User extends BaseUser
     {
         return $this->sections;
     }
+    
+    public function getSectionslist()
+    {
+        $html = '<ul>';
+        $secs = $this->sections;
+        foreach ($secs as $sec) {
+            $html = $html.'<li>'.$sec->getName().'</li>';
+        }
+        $html = $html.'</ul>';
+        
+        return $html;
+    }
 
     /**
      * Add gipproject
@@ -444,6 +456,11 @@ class User extends BaseUser
     public function getGipprojects()
     {
         return $this->gipprojects;
+    }
+    
+    public function getGipprojectscount()
+    {
+        return count($this->gipprojects);
     }
 
     /**
@@ -480,8 +497,24 @@ class User extends BaseUser
         return $this->orders;
     }
     
+    public function getOrderscount()
+    {
+        return count($this->orders);
+    }
+    
+    public function getOrderscountcur()
+    {
+        $cnt = 0;
+        foreach ($this->orders as $order) {
+            if ($order->getFactEndDate() == NULL) {
+                $cnt = $cnt+1;
+            }
+        }
+        return $cnt;
+    }
+    
     public function __toString() 
-     {
-         return $this->getUsername();
-     }
+    {
+        return $this->getUsername();
+    }
 }

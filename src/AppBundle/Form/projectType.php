@@ -9,18 +9,43 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 //use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
+use AppBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 class projectType extends AbstractType
 {
+//    private $tokenStorage;
+//
+//    public function __construct(TokenStorageInterface $tokenStorage)
+//    {
+//        $this->tokenStorage = $tokenStorage;
+//    }
+    
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+         // grab the user, do a quick sanity check that one exists
+//        $user = $this->tokenStorage->getToken()->getUser();
+//        if (!$user) {
+//            throw new \LogicException(
+//                'This cannot be used without an authenticated user!'
+//            );
+//        }
+        $user = $options['user'];
+        $project = $builder->getData();
         $builder
-            ->add('name', null, array('label' => 'Наименование',))
-            ->add('nofot', NumberType::Class, 
-                    array('label' => 'Норма отчисления ФОТ', 'scale' => 3,))
+            ->add('name', null, array(
+                'label' => 'Наименование',
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
+            ))
+            ->add('nofot', NumberType::Class, array(
+                'label' => 'Норма отчисления ФОТ', 
+                'scale' => 3,
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
+            ))
 //            ->add('info', null, array('label' => 'Информация',))
             ->add('Customer', EntityType::class, array(
                 'class' => 'AppBundle\Entity\LegalEntity',
@@ -30,8 +55,8 @@ class projectType extends AbstractType
                 'required' => false,
                 'attr'   =>  array(
                     'class'   => 'js-example-basic-single'),
-                'label' => 'Заказчик'
- 
+                'label' => 'Заказчик',
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             )) 
             ->add('Contractor', EntityType::class, array(
                 'class' => 'AppBundle\Entity\LegalEntity',
@@ -41,8 +66,8 @@ class projectType extends AbstractType
                 'required' => false,
                 'attr'   =>  array(
                     'class'   => 'js-example-basic-single'),
-                'label' => 'Подрядчик'
- 
+                'label' => 'Подрядчик',
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             )) 
             ->add('gip', EntityType::class, array(
                 'class' => 'AppBundle\Entity\User',
@@ -54,7 +79,7 @@ class projectType extends AbstractType
                     'class'   => 'js-example-basic-single'),
                 'label' => 'ГИП',
                 'required' => false,
- 
+                'disabled' => ($user and $user->getId()===$project->getGipId()),
             ))
         ;
     }
@@ -68,5 +93,6 @@ class projectType extends AbstractType
             'data_class' => 'AppBundle\Entity\project',
             'csrf_protection' => false,
         ));
+        $resolver->setRequired('user');
     }
 }

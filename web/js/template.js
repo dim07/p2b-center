@@ -219,6 +219,10 @@
 // bootstrap alert activate
 $().alert();
 
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 //Navigation Menu Slider
     $('#nav-expander').on('click',function(e){
             e.preventDefault();
